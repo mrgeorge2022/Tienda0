@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Digital Interactivo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="owner-name">Mr. George</h1>
+            <div class="business-status" id="business-status">
+                <p id="status-line1">Verificando horario...</p>
+                <p id="status-line2"></p>
+            </div>
+        </div>
+
+
+        <!-- Navigation -->
+        <div class="categories">
+            <button class="category-btn active" onclick="scrollToSection('todos')">Todos</button>
+            <button class="category-btn" onclick="scrollToSection('comida')">Comida</button>
+            <button class="category-btn" onclick="scrollToSection('pizzas')">Pizzas</button>
+            <button class="category-btn" onclick="scrollToSection('almuerzos')">Almuerzos</button>
+            <button class="category-btn" onclick="scrollToSection('bebidas')">Bebidas</button>
+            <button class="category-btn" onclick="scrollToSection('postres')">Postres</button>
+        </div>
+
+        <!-- Skeletal Loading -->
+        <div class="skeleton-container" id="skeleton-loading" style="display: none;">
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-text skeleton-title"></div>
+                <div class="skeleton-text skeleton-price"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-button"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-text skeleton-title"></div>
+                <div class="skeleton-text skeleton-price"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-button"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-text skeleton-title"></div>
+                <div class="skeleton-text skeleton-price"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-button"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-text skeleton-title"></div>
+                <div class="skeleton-text skeleton-price"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-button"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-text skeleton-title"></div>
+                <div class="skeleton-text skeleton-price"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-button"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-text skeleton-title"></div>
+                <div class="skeleton-text skeleton-price"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-description"></div>
+                <div class="skeleton-text skeleton-button"></div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="error-message" style="display: none;">
+            Error al cargar los productos. Por favor, verifica la configuración de Google Sheets.
+        </div>
+
+        <!-- Menu Sections -->
+        <div class="menu-sections">
+            <!-- Comida Section -->
+            <section id="comida" class="menu-section">
+                <h2 class="section-title">🍽️ Comida</h2>
+                <div class="products-grid" id="comida-grid"></div>
+            </section>
+
+            <!-- Pizzas Section -->
+            <section id="pizzas" class="menu-section">
+                <h2 class="section-title">🍕 Pizzas</h2>
+                <div class="products-grid" id="pizzas-grid"></div>
+            </section>
+
+            <!-- Almuerzos Section -->
+            <section id="almuerzos" class="menu-section">
+                <h2 class="section-title">🍛 Almuerzos</h2>
+                <div class="products-grid" id="almuerzos-grid"></div>
+            </section>
+
+            <!-- Bebidas Section -->
+            <section id="bebidas" class="menu-section">
+                <h2 class="section-title">🥤 Bebidas</h2>
+                <div class="products-grid" id="bebidas-grid"></div>
+            </section>
+
+            <!-- Postres Section -->
+            <section id="postres" class="menu-section">
+                <h2 class="section-title">🍰 Postres</h2>
+                <div class="products-grid" id="postres-grid"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Floating Cart -->
+    <div class="cart-float" id="cart-float" onclick="openCart()">
+        <div class="cart-icon">🛒</div>
+        <div class="cart-info">
+            <div class="cart-count" id="cart-count">0 productos</div>
+            <div class="cart-total" id="cart-total">$0</div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="product-modal" id="product-modal">
+        <div class="product-modal-content">
+            <div class="product-modal-header">
+                <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
+                <button class="close-product-modal" onclick="closeProductModal()">×</button>
+            </div>
+
+            <div class="product-modal-image" id="modal-product-image">
+                🍽️
+            </div>
+
+            <div class="product-modal-price" id="modal-product-price">$0</div>
+
+            <div class="product-modal-description" id="modal-product-description">
+                Descripción del producto
+            </div>
+
+
+            <div class="instructions-section">
+                <label class="instructions-label" for="product-instructions">
+                    Instrucciones especiales (opcional):
+                </label>
+                <textarea id="product-instructions" class="instructions-textarea"
+                    placeholder="Ej: Sin cebolla, extra queso, término medio..."></textarea>
+            </div>
+
+            <div class="quantity-section">
+                <div class="quantity-control">
+                    <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
+                    <span class="quantity-display" id="modal-quantity">1</span>
+                    <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
+                </div>
+            </div>
+
+            <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
+                Agregar al carrito
+            </button>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <button class="close-cart" onclick="closeCart()">×</button>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <!-- Cart items will be inserted here -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
+                <div class="cart-actions">
+                    <button class="cart-btn clear-cart" onclick="clearCart()">Vaciar</button>
+                    <button class="cart-btn checkout-btn" onclick="checkout()">Pedir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</html>
