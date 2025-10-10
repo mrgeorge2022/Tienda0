@@ -9,20 +9,8 @@ const APPS_SCRIPT_URL =
 // Variables globales
 let products = [];
 let cart = [];
-let isOpen = false;
 let currentProduct = null;
 let modalQuantity = 1;
-
-// 🕒 --- Horarios por día ---
-const BUSINESS_HOURS = {
-  0: { open: 0, close: 24 },
-  1: { open: 0, close: 24 },
-  2: { open: 0, close: 24 },
-  3: { open: 0, close: 24 },
-  4: { open: 0, close: 24 },
-  5: { open: 0, close: 24 },
-  6: { open: 0, close: 24 },
-};
 
 
 // DOM Elements
@@ -36,125 +24,11 @@ const productModalEl = document.getElementById("product-modal");
 // Initialize app
 document.addEventListener("DOMContentLoaded", function () {
   loadProducts();
-  checkBusinessHours();
-  setInterval(checkBusinessHours, 60000);
 });
 
-// ✅ Verifica si la tienda está abierta
-function checkBusinessHours() {
-  const now = new Date();
-  const currentDay = now.getDay();
-  const currentHour = now.getHours() + now.getMinutes() / 60;
-  const schedule = BUSINESS_HOURS[currentDay];
+// Nota: la lógica de horario fue eliminada; la tienda siempre permite interacción local
 
-  if (!schedule) {
-    isOpen = false;
-  } else {
-    // Manejar rangos normales y rangos que cruzan la medianoche
-    const open = Number(schedule.open);
-    const close = Number(schedule.close);
-    if (isNaN(open) || isNaN(close)) {
-      isOpen = false;
-    } else if (close > open) {
-      // ejemplo: open 11, close 22
-      isOpen = currentHour >= open && currentHour < close;
-    } else if (close === open) {
-      // mismo valor -> cerrado todo el día
-      isOpen = false;
-    } else {
-      // close < open => horario que cruza medianoche, ejemplo open 18, close 2
-      isOpen = currentHour >= open || currentHour < close;
-    }
-  }
 
-  updateBusinessHoursDisplay();
-  updateProductButtons();
-}
-
-// ✅ Muestra el estado actual
-function updateBusinessHoursDisplay() {
-  const now = new Date();
-  const currentDay = now.getDay();
-  const schedule = BUSINESS_HOURS[currentDay];
-  const statusLine1 = document.getElementById("status-line1");
-  const statusLine2 = document.getElementById("status-line2");
-
-  if (!statusLine1 || !statusLine2) return;
-
-  if (!schedule) {
-    statusLine1.textContent = "La tienda está cerrada hoy.";
-    statusLine1.style.color = "#e53e3e";
-    statusLine2.textContent = "Abrimos mañana.";
-    return;
-  }
-
-  if (isOpen) {
-    // Calcular minutos restantes hasta el cierre, considerando overnight
-    const nowDecimal = now.getHours() + now.getMinutes() / 60;
-    const open = Number(schedule.open);
-    const close = Number(schedule.close);
-
-    let minutesToClose;
-    if (close > open) {
-      minutesToClose = Math.round((close - nowDecimal) * 60);
-    } else {
-      // close < open (overnight). Si ahora >= open contamos hasta (24 - now) + close
-      if (nowDecimal >= open) {
-        minutesToClose = Math.round((24 - nowDecimal + close) * 60);
-      } else {
-        // ahora antes de close (en la madrugada)
-        minutesToClose = Math.round((close - nowDecimal) * 60);
-      }
-    }
-
-    const hours = Math.floor(minutesToClose / 60);
-    const mins = minutesToClose % 60;
-    statusLine1.textContent = "¡La tienda está abierta!";
-    statusLine1.style.color = "#48bb78";
-    statusLine2.textContent = `Cierra en ${hours > 0 ? `${hours}h ` : ""}${mins}min.`;
-  } else {
-    let nextDay = currentDay;
-    for (let i = 1; i <= 7; i++) {
-      const d = (currentDay + i) % 7;
-      if (BUSINESS_HOURS[d]) {
-        nextDay = d;
-        break;
-      }
-    }
-
-    const nextSchedule = BUSINESS_HOURS[nextDay];
-    statusLine1.textContent = "La tienda está cerrada.";
-    statusLine1.style.color = "#e53e3e";
-    if (!nextSchedule) {
-      statusLine2.textContent = "No hay horario disponible próximamente.";
-    } else {
-      statusLine2.textContent = `Abre ${
-        nextDay === currentDay ? "hoy" : `el ${getDayName(nextDay)}`
-      } a las ${formatHour(nextSchedule.open)}.`;
-    }
-  }
-}
-
-function getDayName(dayIndex) {
-  const days = [
-    "domingo",
-    "lunes",
-    "martes",
-    "miércoles",
-    "jueves",
-    "viernes",
-    "sábado",
-  ];
-  return days[dayIndex];
-}
-
-function formatHour(hourDecimal) {
-  const h = Math.floor(hourDecimal);
-  const m = Math.round((hourDecimal - h) * 60);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const displayH = h % 12 === 0 ? 12 : h % 12;
-  return `${displayH}:${m.toString().padStart(2, "0")} ${ampm}`;
-}
 
 // ✅ Actualiza botones de productos
 function updateProductButtons() {
@@ -162,11 +36,8 @@ function updateProductButtons() {
   addButtons.forEach((btn) => {
     // El botón + es solo visual: siempre muestra '+' y solo se aplica la clase
     // 'inactive' para estilos cuando el local está cerrado.
-    if (isOpen) {
-      btn.classList.remove("inactive");
-    } else {
-      btn.classList.add("inactive");
-    }
+    // Mantener siempre habilitado visualmente; la disponibilidad real viene de product.activo
+    btn.classList.remove("inactive");
     // Asegurar símbolo visual
     btn.textContent = "+";
   });
@@ -176,15 +47,108 @@ function updateProductButtons() {
 async function loadProducts() {
   try {
     showLoading(true);
-    const response = await fetch(APPS_SCRIPT_URL);
-    const data = await response.json();
-    products = data;
+    // Pedimos explícitamente la hoja Productos para evitar confusiones con otras hojas
+    const url = `${APPS_SCRIPT_URL}?sheet=Productos`;
+    const response = await fetch(url);
+
+    // Clonar y registrar texto crudo para depuración (no afecta al parseo)
+    const rawText = await response.clone().text();
+    try {
+      console.groupCollapsed('Carga productos - respuesta cruda');
+      console.log(rawText.slice(0, 2000));
+      console.groupEnd();
+    } catch (e) {}
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      // Si la respuesta no es JSON (p. ej. JSONP), intentar parsear como texto y extraer JSON
+      data = tryParsePossibleJSONP(rawText);
+    }
+
+    // Normalizar: si viene como array de arrays (filas), convertir a array de objetos
+    if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
+      const rows = data.slice();
+      const headers = rows.shift().map((h) => String(h).trim());
+      data = rows.map((r) => {
+        const obj = {};
+        headers.forEach((hh, i) => {
+          obj[hh] = r[i];
+        });
+        return obj;
+      });
+    }
+
+    // Asegurar que sea un array de objetos
+    if (!Array.isArray(data)) {
+      console.error('La respuesta de productos no es un array:', data);
+      throw new Error('Formato de datos de productos inesperado');
+    }
+
+    // Normalizar claves comunes (minusculas) y tipos
+    // Helper: normalizar clave (quita acentos, espacios y pasa a minusculas)
+    const normalizeKey = (k) =>
+      String(k || '')
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .replace(/\s+/g, '')
+        .toLowerCase();
+
+    products = data.map((row, idx) => {
+      const p = {};
+      // construir mapa de claves normalizadas -> valor
+      const keyMap = {};
+      Object.keys(row).forEach((k) => {
+        keyMap[normalizeKey(k)] = row[k];
+      });
+
+      const getNormalized = (aliases) => {
+        for (const a of aliases) {
+          const nk = normalizeKey(a);
+          if (keyMap[nk] !== undefined) return keyMap[nk];
+        }
+        return undefined;
+      };
+
+      p.id = getNormalized(['id', 'ID', 'Id']) ?? idx;
+      p.nombre = getNormalized(['nombre', 'Nombre', 'NAME', 'name', 'producto', 'Producto']) ?? '';
+      p.categoria = getNormalized(['categoria', 'Categoria', 'CATEGORIA']) ?? '';
+      p.precio = getNormalized(['precio', 'Precio', 'price']) ?? 0;
+      const activoRaw = getNormalized(['activo', 'Activo']);
+      p.activo = activoRaw === true || String(activoRaw).toUpperCase() === 'TRUE' || activoRaw === 1 || String(activoRaw) === '1';
+      p.imagen = getNormalized(['imagen', 'Imagen', 'image']) || '';
+      p.descripcion = getNormalized(['descripcion', 'Descripcion', 'Descripción', 'descripcion']) || '';
+      p.config = getNormalized(['config', 'Config']) || '';
+      return p;
+    });
+    // Si no hay productos, mostrar pista útil para depuración
+    if (!products || products.length === 0) {
+      console.warn('No se cargaron productos. Respuesta cruda (primeros 1000 chars):', rawText.slice(0, 1000));
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'No se encontraron productos en la respuesta. Revisa la consola (raw response) o asegúrate de que la hoja "Productos" exista y tenga datos.';
+    }
     showLoading(false);
     renderProducts();
   } catch (err) {
     console.error(err);
     showLoading(false);
     errorEl.style.display = "block";
+  }
+}
+
+function tryParsePossibleJSONP(txt) {
+  // Si txt es JSONP del tipo callback({...}) o callback([...]) extraer el contenido
+  try {
+    const m = txt.match(/^\s*([a-zA-Z0-9_$.]+)\s*\((([\s\S]*)?)\)\s*;?\s*$/);
+    if (m && m[2]) {
+      return JSON.parse(m[2]);
+    }
+    // Si no es JSONP, intentar JSON.parse directo
+    return JSON.parse(txt);
+  } catch (e) {
+    console.warn('No se pudo parsear respuesta como JSON/JSONP', e);
+    return [];
   }
 }
 
@@ -196,9 +160,14 @@ function renderProducts() {
     const grid = document.getElementById(`${category}-grid`);
     if (!grid) return;
 
-    const filteredProducts = products.filter(
-      (product) => product.categoria.toLowerCase() === category
-    );
+    const filteredProducts = products.filter((product) => {
+      try {
+        const cat = (product.categoria || '').toString().toLowerCase();
+        return cat === category;
+      } catch (e) {
+        return false;
+      }
+    });
 
     grid.innerHTML = "";
 
@@ -269,25 +238,7 @@ function createProductCard(product) {
       alert("⚠️ Este producto está agotado temporalmente.");
       return;
     }
-
-    if (!isOpen) {
-      const now = new Date();
-      const currentDay = now.getDay();
-      const schedule = BUSINESS_HOURS[currentDay];
-
-      if (!schedule) {
-        // 🛑 Día completamente cerrado
-        alert("🚪 La tienda está cerrada hoy.");
-      } else {
-        // ⏰ Fuera de horario
-        const abre = formatHour(schedule.open);
-        const cierra = formatHour(schedule.close);
-        alert(
-          `⏰ Estamos fuera de horario.\nTe invitamos a ver nuestro horario`
-        );
-      }
-      return;
-    }
+    // Siempre permitimos abrir el modal si el producto está activo
 
     // ✅ Si la tienda está abierta y el producto activo → abre el modal
     openProductModal(product);
@@ -323,20 +274,7 @@ function formatPrice(price) {
 
 // Product Modal Functions
 function openProductModal(product) {
-  if (!isOpen) {
-    const now = new Date();
-    const currentDay = now.getDay();
-
-    if (currentDay === CLOSED_DAY) {
-      alert(
-        "Lo sentimos, estamos cerrados los miércoles. Abrimos mañana a las 11:00 AM"
-      );
-    } else {
-      const timeToOpen = getTimeToOpen();
-      alert(`Lo sentimos, estamos cerrados. Abrimos en: ${timeToOpen}`);
-    }
-    return;
-  }
+  // Modal abierto sin restricciones de horario (la disponibilidad por producto sigue)
 
   if (!product.activo) {
     alert("Este producto está agotado temporalmente");
@@ -490,7 +428,7 @@ function updateQuantityButtons() {
 }
 
 function addToCartFromModal() {
-  if (!currentProduct || !isOpen) return;
+  if (!currentProduct) return;
 
   // --- CAPTURAR OPCIONES DE PIZZA Y ALMUERZO ---
   let extraInstructions = "";
@@ -715,21 +653,6 @@ function checkout() {
     return;
   }
 
-  if (!isOpen) {
-    const now = new Date();
-    const currentDay = now.getDay();
-
-    if (currentDay === CLOSED_DAY) {
-      alert(
-        "Lo sentimos, estamos cerrados los miércoles. Abrimos mañana a las 11:00 AM"
-      );
-    } else {
-      const timeToOpen = getTimeToOpen();
-      alert(`Lo sentimos, estamos cerrados. Abrimos en: ${timeToOpen}`);
-    }
-    return;
-  }
-
   const orderSummary = cart
     .map(
       (item) =>
@@ -760,17 +683,24 @@ function checkout() {
 
 // Scroll to section function
 function scrollToSection(sectionId) {
+  // remover active de todos los botones
   categoryBtns.forEach((btn) => btn.classList.remove("active"));
-  event.target.classList.add("active");
+
+  // intentar encontrar el botón que tiene como texto la sección (si existe)
+  let clickedBtn = Array.from(categoryBtns).find((b) => b.getAttribute('onclick') && b.getAttribute('onclick').includes(sectionId));
+  if (!clickedBtn) {
+    // fallback: usar el primer botón
+    clickedBtn = categoryBtns[0];
+  }
+  if (clickedBtn) clickedBtn.classList.add('active');
 
   if (sectionId === "todos") {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  } else {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
+    return;
   }
+
+  const section = document.getElementById(sectionId);
+  if (section) section.scrollIntoView({ behavior: "smooth" });
 }
 
 // Show/hide loading state
