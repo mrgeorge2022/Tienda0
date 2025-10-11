@@ -1,26 +1,33 @@
 :root {
     /* Fondo principal */
-    --bg-start: #f5f7fa;         /* blanco grisáceo */
-    --bg-end: #e2e8f0;           /* gris claro */
-    
+    --bg-start: #f5f7fa;
+    /* blanco grisáceo */
+    --bg-end: #e2e8f0;
+    /* gris claro */
+
     /* Tarjetas y modales */
-    --card-bg: #ffffff;          /* blanco puro para tarjetas */
-    
+    --card-bg: #ffffff;
+    /* blanco puro para tarjetas */
+
     /* Texto y elementos secundarios */
-    --muted: #718096;            /* gris medio para texto secundario */
-    
+    --muted: #718096;
+    /* gris medio para texto secundario */
+
     /* Colores de acento */
-    --primary-1: #f6c90e;        /* amarillo cálido */
-    --primary-2: #e0b800;        /* amarillo más oscuro para gradiente */
-    
+    --primary-1: #f6c90e;
+    /* amarillo cálido */
+    --primary-2: #e0b800;
+    /* amarillo más oscuro para gradiente */
+
     --accent: linear-gradient(45deg, var(--primary-1) 0%, var(--primary-2) 100%);
-    
+
     /* Sombras */
     --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     --soft-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    
+
     /* Texto principal */
-    --text-color: #2d3748;       /* gris oscuro para legibilidad */
+    --text-color: #2d3748;
+    /* gris oscuro para legibilidad */
 }
 
 
@@ -28,6 +35,7 @@
 html,
 body {
     height: 100%;
+    margin-bottom: 1000px;
 }
 
 body {
@@ -37,45 +45,128 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
     min-height: 100%;
+    padding-bottom: 200px;
 }
+
+/* =========================================
+   HEADER PRINCIPAL
+   -----------------------------------------
+   Estructura limpia, moderna y profesional.
+   Logo + Nombre + Estado.
+========================================= */
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    margin-left: 20px;
+    padding-top: 30px;
+
 }
 
-/* Header */
+/* ---------- HEADER GENERAL ---------- */
 .header {
-    padding: 30px;
-    text-align: left;
-}
-
-.logo {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 15px;
-    background: var(--accent);
-    border-radius: 50%;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+/* ---------- SECCIÓN IZQUIERDA: LOGO + NOMBRE + ESTADO ---------- */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    /* espacio entre logo y texto */
+}
+
+/* ---------- LOGO ---------- */
+.header-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #f0f0f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+}
+
+/* ---------- NOMBRE Y ESTADO ---------- */
+.header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    font-size: 24px;
-    color: white;
 }
 
-.header h1 {
-    margin: 0;
-    color: var(--text-color);
-    font-size: 2.5rem;
+/* Nombre del negocio */
+.header-info h1 {
+    font-size: 1.8rem;
     font-weight: 700;
+    color: #222;
+    margin: 0;
+    line-height: 1.2;
+    margin-bottom: 5px;
 }
 
-.header p {
-    margin: 10px 0 0;
-    color: var(--muted);
-    font-size: 1.1rem;
+/* ---------- STATUS HEADER (DENTRO DE HEADER INFO) ---------- */
+#status-header {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Texto base */
+.status-text {
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+/* Subtexto (tiempo restante) */
+.status-text.time-remaining {
+    font-size: 10px;
+    opacity: 0.85;
+}
+
+/* ---------- ESTADOS ---------- */
+#status-header.open {
+    background-color: #28a745;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
+    text-align: center;
+}
+
+#status-header.closed {
+    background-color: transparent;
+    color: rgba(60, 60, 60, 0.6);
+    box-shadow: none;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .header-left {
+        flex-direction: flex;
+    }
+
+    .header-info h1 {
+        font-size: 1.4rem;
+    }
+}
+
+
+
+
 
 /* Business Hours Status (removed) */
 /* Categories */
@@ -295,8 +386,16 @@ body {
     font-size: 0.9rem;
     color: var(--muted);
     line-height: 1.4;
-    font-style: italic;
+
+    /* 🔹 Truncar en varias líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* cambia el número de líneas visibles */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 
 .add-button {
     position: absolute;
@@ -444,7 +543,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
 }
 
 .product-modal-title {
@@ -456,7 +554,7 @@ body {
 .close-product-modal {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     cursor: pointer;
     color: #718096;
 }
@@ -495,34 +593,97 @@ body {
     font-style: italic;
 }
 
-.instructions-section {
-    margin-bottom: 25px;
+
+/* ===============================
+   OPCIONES PERSONALIZABLES
+================================ */
+#extra-options {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin-top: 15px;
+    backdrop-filter: blur(6px);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.instructions-label {
-    font-size: 1rem;
+
+#extra-options h4 {
+    margin: 0 0 12px 0;
+    font-size: 1.05rem;
     font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 8px;
-    display: block;
+    color: var(--text-color, #fff);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 6px;
 }
 
+#extra-options label {
+    color: var(--muted, #ccc);
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+#extra-options label:hover {
+    color: var(--text-color, #fff);
+}
+
+#extra-options input[type="checkbox"] {
+    accent-color: var(--primary, #00b894);
+    margin-right: 6px;
+}
+/* ===============================
+   📝 INSTRUCCIONES ESPECIALES
+================================ */
+.instructions-section {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Etiqueta del textarea */
+.instructions-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color, #e2e8f0);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+/* Campo de texto */
 .instructions-textarea {
-    width: 95%;
-    min-height: 80px;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-family: inherit;
-    resize: vertical;
-    transition: border-color 0.3s ease;
+  width: 90%;
+  min-height: 90px;
+  padding: 12px 14px;
+  border: 1.5px solid rgb(0, 0, 0);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-color, #fff);
+  font-size: 0.95rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.4;
+  resize: vertical;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
 }
 
-.instructions-textarea:focus {
-    outline: none;
-    border-color: #667eea;
+/* Placeholder más tenue */
+.instructions-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+  font-style: italic;
 }
+
+/* Efecto al enfocar */
+.instructions-textarea:focus {
+  outline: none;
+  border-color: var(--primary, #00b894);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 6px rgba(0, 184, 148, 0.3);
+}
+
 
 .quantity-section {
     display: flex;
@@ -668,7 +829,7 @@ body {
 
 .item-name {
     font-weight: 600;
-    color: #fff;
+    color: #000000;
     margin-bottom: 5px;
 }
 
@@ -781,12 +942,14 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+
+
     .container {
-        padding: 25px;
+        margin-left: 0;
     }
 
     .header h1 {
-        font-size: 2rem;
+        font-size: 25px;
     }
 
     .products-grid {

@@ -9,120 +9,147 @@
 </head>
 
 <body>
-<div class="container">
-    <div class="header">
-        <div class="header-left">
-            <img src="iconos/" alt="Logo" class="header-logo">
-            <h1>Mr. George</h1>
-        </div>
-        <div id="status-header">
-            <!-- Estado se carga directamente -->
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="img/icono_tienda.png" alt="Logo" class="header-logo">
+
+                <div class="header-info">
+                    <h1>Mr. George</h1>
+                    <div id="status-header">
+                        <!-- Estado dinámico -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
 
 
-        <!-- Navigation -->
-        <div class="categories">
-            <button class="category-btn active" onclick="scrollToSection('todos')">Todos</button>
-            <button class="category-btn" onclick="scrollToSection('comida')">Comida</button>
-            <button class="category-btn" onclick="scrollToSection('pizzas')">Pizzas</button>
-            <button class="category-btn" onclick="scrollToSection('almuerzos')">Almuerzos</button>
-            <button class="category-btn" onclick="scrollToSection('bebidas')">Bebidas</button>
-            <button class="category-btn" onclick="scrollToSection('postres')">Postres</button>
+
+    <!-- Navigation -->
+    <div class="categories">
+        <button class="category-btn active" onclick="scrollToSection('todos'); loadProducts();">🌟 Todos</button>
+        <button class="category-btn" onclick="scrollToSection('almuerzos')">🍛 Almuerzos</button>
+        <button class="category-btn" onclick="scrollToSection('perros')">🌭 Perros</button>
+        <button class="category-btn" onclick="scrollToSection('hamburguesas')">🍔 Hamburguesas</button>
+        <button class="category-btn" onclick="scrollToSection('salchipapas')">🍟 Salchipapas</button>
+        <button class="category-btn" onclick="scrollToSection('picadas')">🍖 Picadas</button>
+        <button class="category-btn" onclick="scrollToSection('pizzas')">🍕 Pizzas</button>
+        <button class="category-btn" onclick="scrollToSection('bebidas')">🥤 Bebidas</button>
+        <button class="category-btn" onclick="scrollToSection('acompanantes')">🍴 Acompañantes</button>
+    </div>
+
+
+    <!-- Skeletal Loading -->
+    <div class="skeleton-container" id="skeleton-loading" style="display: none;">
+        <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-button"></div>
         </div>
-
-        <!-- Skeletal Loading -->
-        <div class="skeleton-container" id="skeleton-loading" style="display: none;">
-            <div class="skeleton-card">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-text skeleton-title"></div>
-                <div class="skeleton-text skeleton-price"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-button"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-text skeleton-title"></div>
-                <div class="skeleton-text skeleton-price"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-button"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-text skeleton-title"></div>
-                <div class="skeleton-text skeleton-price"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-button"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-text skeleton-title"></div>
-                <div class="skeleton-text skeleton-price"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-button"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-text skeleton-title"></div>
-                <div class="skeleton-text skeleton-price"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-button"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton-image"></div>
-                <div class="skeleton-text skeleton-title"></div>
-                <div class="skeleton-text skeleton-price"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-description"></div>
-                <div class="skeleton-text skeleton-button"></div>
-            </div>
+        <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-button"></div>
         </div>
-
-        <!-- Error Message -->
-        <div class="error-message" id="error-message" style="display: none;">
-            Error al cargar los productos. Por favor, verifica la configuración de Google Sheets.
+        <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-button"></div>
         </div>
-
-        <!-- Menu Sections -->
-        <div class="menu-sections">
-            <!-- Comida Section -->
-            <section id="comida" class="menu-section">
-                <h2 class="section-title">🍽️ Comida</h2>
-                <div class="products-grid" id="comida-grid"></div>
-            </section>
-
-            <!-- Pizzas Section -->
-            <section id="pizzas" class="menu-section">
-                <h2 class="section-title">🍕 Pizzas</h2>
-                <div class="products-grid" id="pizzas-grid"></div>
-            </section>
-
-            <!-- Almuerzos Section -->
-            <section id="almuerzos" class="menu-section">
-                <h2 class="section-title">🍛 Almuerzos</h2>
-                <div class="products-grid" id="almuerzos-grid"></div>
-            </section>
-
-            <!-- Bebidas Section -->
-            <section id="bebidas" class="menu-section">
-                <h2 class="section-title">🥤 Bebidas</h2>
-                <div class="products-grid" id="bebidas-grid"></div>
-            </section>
-
-            <!-- Postres Section -->
-            <section id="postres" class="menu-section">
-                <h2 class="section-title">🍰 Postres</h2>
-                <div class="products-grid" id="postres-grid"></div>
-            </section>
+        <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-button"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-button"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-description"></div>
+            <div class="skeleton-text skeleton-button"></div>
         </div>
     </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="error-message" style="display: none;">
+        Error al cargar los productos. Por favor, verifica la configuración de Google Sheets.
+    </div>
+    <!-- Menu Sections -->
+    <div class="menu-sections">
+
+        <!-- Almuerzos Section -->
+        <section id="almuerzos" class="menu-section">
+            <h2 class="section-title">🍛 Almuerzos</h2>
+            <div class="products-grid" id="almuerzos-grid"></div>
+        </section>
+
+        <!-- Perros Section -->
+        <section id="perros" class="menu-section">
+            <h2 class="section-title">🌭 Perros</h2>
+            <div class="products-grid" id="perros-grid"></div>
+        </section>
+
+        <!-- Hamburguesas Section -->
+        <section id="hamburguesas" class="menu-section">
+            <h2 class="section-title">🍔 Hamburguesas</h2>
+            <div class="products-grid" id="hamburguesas-grid"></div>
+        </section>
+
+        <!-- Salchipapas Section -->
+        <section id="salchipapas" class="menu-section">
+            <h2 class="section-title">🍟 Salchipapas</h2>
+            <div class="products-grid" id="salchipapas-grid"></div>
+        </section>
+
+        <!-- Picadas Section -->
+        <section id="picadas" class="menu-section">
+            <h2 class="section-title">🍖 Picadas</h2>
+            <div class="products-grid" id="picadas-grid"></div>
+        </section>
+
+        <!-- Pizzas Section -->
+        <section id="pizzas" class="menu-section">
+            <h2 class="section-title">🍕 Pizzas</h2>
+            <div class="products-grid" id="pizzas-grid"></div>
+        </section>
+
+        <!-- Bebidas Section -->
+        <section id="bebidas" class="menu-section">
+            <h2 class="section-title">🥤 Bebidas</h2>
+            <div class="products-grid" id="bebidas-grid"></div>
+        </section>
+
+        <!-- Acompañantes Section -->
+        <section id="acompanantes" class="menu-section">
+            <h2 class="section-title">🍴 Acompañantes</h2>
+            <div class="products-grid" id="acompanantes-grid"></div>
+        </section>
+
+    </div>
+
 
     <!-- Floating Cart -->
     <div class="cart-float" id="cart-float" onclick="openCart()">

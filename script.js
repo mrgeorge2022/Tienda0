@@ -154,7 +154,17 @@ function tryParsePossibleJSONP(txt) {
 
 // Render products by sections
 function renderProducts() {
-  const categories = ["comida", "pizzas", "almuerzos", "bebidas", "postres"];
+const categories = [
+  "almuerzos",
+  "perros",
+  "hamburguesas",
+  "salchipapas",
+  "picadas",
+  "pizzas",
+  "bebidas",
+  "acompanantes"
+];
+
 
   categories.forEach((category) => {
     const grid = document.getElementById(`${category}-grid`);
@@ -247,18 +257,22 @@ function createProductCard(product) {
   return card;
 }
 
-// Get emoji based on category
+// ✅ Get emoji based on category
 function getCategoryEmoji(categoria) {
   const emojis = {
-    comida: "🍽️",
-    bebida: "🥤",
-    bebidas: "🥤",
-    postres: "🍰",
-    pizzas: "🍕",
+    recomendados: "⭐",
     almuerzos: "🍛",
+    perros: "🌭",
+    hamburguesas: "🍔",
+    salchipapas: "🍟",
+    picadas: "🥩",
+    pizzas: "🍕",
+    bebidas: "🥤",
+    acompañantes: "🍚",
   };
   return emojis[categoria.toLowerCase()] || "🍽️";
 }
+
 
 // Format price in Colombian pesos
 function formatPrice(price) {
@@ -321,85 +335,87 @@ function openProductModal(product) {
   document.getElementById("modal-quantity").textContent = modalQuantity;
   updateQuantityButtons();
 
-  // 🔥 --- NUEVO BLOQUE AGREGADO: configuración especial para pizzas o almuerzos ---
-  const extraOptionsContainer = document.getElementById("extra-options");
-  if (extraOptionsContainer) extraOptionsContainer.remove(); // limpiar si ya existe
 
-  // Usamos el contenedor correcto del modal
-  // Insertar justo antes del botón "Agregar al carrito"
-  const modalBody = document.querySelector("#add-to-cart-modal").parentElement;
-  const insertBeforeEl = document.querySelector(".quantity-section");
 
-  if (product.config) {
-    const configType = product.config.toLowerCase().trim();
 
-    // 🍕 Configuración especial para pizzas
-    if (configType === "manualpizza") {
-      const pizzaOptions = document.createElement("div");
-      pizzaOptions.id = "extra-options";
-      pizzaOptions.innerHTML = `
-        <hr style="margin: 15px 0;">
-        <h4 style="margin-bottom: 8px;">🍕 Personaliza tu pizza</h4>
+  
 
-        <label style="font-weight: bold;">Tamaño:</label>
-        <div id="pizza-size" style="margin-bottom: 10px;">
-            <label><input type="checkbox" value="Personal"> Personal</label><br>
-            <label><input type="checkbox" value="Mediana"> Mediana</label><br>
-            <label><input type="checkbox" value="Grande"> Grande</label><br>
-        </div>
+// 🔥 --- BLOQUE CORREGIDO: configuración especial para pizzas o almuerzos ---
+const existingExtraOptions = document.getElementById("extra-options");
+if (existingExtraOptions) existingExtraOptions.remove(); // limpiar si ya existe
 
-        <label style="font-weight: bold;">Ingredientes:</label>
-        <div id="pizza-ingredients" style="margin-bottom: 10px;">
-            <label><input type="checkbox" value="Peperoni"> Peperoni</label><br>
-            <label><input type="checkbox" value="Extra queso"> Extra queso</label><br>
-            <label><input type="checkbox" value="Champiñones"> Champiñones</label><br>
-            <label><input type="checkbox" value="Tocineta"> Tocineta</label><br>
-        </div>
+// Obtenemos el contenedor del modal y el punto de inserción
+const modalBody = document.querySelector("#add-to-cart-modal").parentElement;
 
-        <label for="pizza-extra" style="font-weight: bold;">Notas u opciones adicionales:</label>
-        <textarea id="pizza-extra" placeholder="Ejemplo: mitad hawaiana, mitad mexicana" style="width: 100%; height: 60px; margin-top: 5px;"></textarea>
+// La sección de instrucciones ya existe en el HTML
+const instructionsSection = document.querySelector(".instructions-section");
+
+// Si el producto tiene configuración personalizada
+if (product.config) {
+  const configType = product.config.toLowerCase().trim();
+  const customOptions = document.createElement("div");
+  customOptions.id = "extra-options";
+
+  if (configType === "manualpizza") {
+    customOptions.innerHTML = `
+      <h4 style="margin-bottom: 8px;">Personaliza tu pizza</h4>
+
+      <label style="font-weight: bold;">Tamaño:</label>
+      <div id="pizza-size" style="margin-bottom: 10px;">
+          <label><input type="checkbox" value="Personal"> Personal</label><br>
+          <label><input type="checkbox" value="Mediana"> Mediana</label><br>
+          <label><input type="checkbox" value="Grande"> Grande</label><br>
+      </div>
+
+      <label style="font-weight: bold;">Ingredientes:</label>
+      <div id="pizza-ingredients" style="margin-bottom: 10px;">
+          <label><input type="checkbox" value="Peperoni"> Peperoni</label><br>
+          <label><input type="checkbox" value="Extra queso"> Extra queso</label><br>
+          <label><input type="checkbox" value="Champiñones"> Champiñones</label><br>
+          <label><input type="checkbox" value="Tocineta"> Tocineta</label><br>
+      </div>
     `;
-      modalBody.insertBefore(pizzaOptions, insertBeforeEl);
-    } else if (configType === "manualalmuerzo") {
-      const almuerzoOptions = document.createElement("div");
-      almuerzoOptions.id = "extra-options";
-      almuerzoOptions.innerHTML = `
-        <hr style="margin: 15px 0;">
-        <h4 style="margin-bottom: 8px;">🍛 Personaliza tu almuerzo</h4>
-
-        <label style="font-weight: bold;">Proteína:</label>
-        <div id="almuerzo-proteina" style="margin-bottom: 10px;">
-            <label><input type="checkbox" value="Pollo asado"> Pollo asado</label><br>
-            <label><input type="checkbox" value="Carne de res"> Carne de res</label><br>
-            <label><input type="checkbox" value="Cerdo"> Cerdo</label><br>
-            <label><input type="checkbox" value="Pescado"> Pescado</label><br>
-        </div>
-
-        <label style="font-weight: bold;">Acompañamiento:</label>
-        <div id="almuerzo-acompanamiento" style="margin-bottom: 10px;">
-            <label><input type="checkbox" value="Arroz blanco"> Arroz blanco</label><br>
-            <label><input type="checkbox" value="Arroz con coco"> Arroz con coco</label><br>
-            <label><input type="checkbox" value="Puré de papa"> Puré de papa</label><br>
-            <label><input type="checkbox" value="Patacones"> Patacones</label><br>
-        </div>
-
-        <label style="font-weight: bold;">Bebida:</label>
-        <div id="almuerzo-bebida" style="margin-bottom: 10px;">
-            <label><input type="checkbox" value="Jugo natural"> Jugo natural</label><br>
-            <label><input type="checkbox" value="Gaseosa"> Gaseosa</label><br>
-            <label><input type="checkbox" value="Agua"> Agua</label><br>
-        </div>
-
-        <label for="almuerzo-extra" style="font-weight: bold;">Notas u observaciones:</label>
-        <textarea id="almuerzo-extra" placeholder="Ejemplo: sin cebolla, jugo sin azúcar" style="width: 100%; height: 60px; margin-top: 5px;"></textarea>
-    `;
-      modalBody.insertBefore(almuerzoOptions, insertBeforeEl);
-    }
   }
-  // 🔥 --- FIN DEL BLOQUE NUEVO ---
 
-  // Show modal
-  productModalEl.classList.add("show");
+  else if (configType === "manualalmuerzo") {
+    customOptions.innerHTML = `
+      <h4 style="margin-bottom: 8px;">Personaliza tu almuerzo</h4>
+
+      <label style="font-weight: bold;">Proteína:</label>
+      <div id="almuerzo-proteina" style="margin-bottom: 10px;">
+          <label><input type="checkbox" value="Pollo asado"> Pollo asado</label><br>
+          <label><input type="checkbox" value="Carne de res"> Carne de res</label><br>
+          <label><input type="checkbox" value="Cerdo"> Cerdo</label><br>
+          <label><input type="checkbox" value="Pescado"> Pescado</label><br>
+      </div>
+
+      <label style="font-weight: bold;">Acompañamiento:</label>
+      <div id="almuerzo-acompanamiento" style="margin-bottom: 10px;">
+          <label><input type="checkbox" value="Arroz blanco"> Arroz blanco</label><br>
+          <label><input type="checkbox" value="Arroz con coco"> Arroz con coco</label><br>
+          <label><input type="checkbox" value="Puré de papa"> Puré de papa</label><br>
+          <label><input type="checkbox" value="Patacones"> Patacones</label><br>
+      </div>
+
+      <label style="font-weight: bold;">Bebida:</label>
+      <div id="almuerzo-bebida" style="margin-bottom: 10px;">
+          <label><input type="checkbox" value="Jugo natural"> Jugo natural</label><br>
+          <label><input type="checkbox" value="Gaseosa"> Gaseosa</label><br>
+          <label><input type="checkbox" value="Agua"> Agua</label><br>
+      </div>
+    `;
+  }
+
+  // ✅ Insertar las opciones personalizables justo antes de la sección de instrucciones
+  if (instructionsSection) {
+    modalBody.insertBefore(customOptions, instructionsSection);
+  }
+}
+// 🔥 --- FIN DEL BLOQUE NUEVO ---
+
+
+// Show modal
+productModalEl.classList.add("show");
 }
 
 function closeProductModal() {
