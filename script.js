@@ -250,6 +250,11 @@ function createProductCard(product) {
     }
     // Siempre permitimos abrir el modal si el producto está activo
 
+updateAddToCartButton(); // 🔥 actualiza el texto del botón con precio inicial
+productModalEl.classList.add("show");
+
+
+
     // ✅ Si la tienda está abierta y el producto activo → abre el modal
     openProductModal(product);
   });
@@ -344,10 +349,10 @@ function openProductModal(product) {
 const existingExtraOptions = document.getElementById("extra-options");
 if (existingExtraOptions) existingExtraOptions.remove(); // limpiar si ya existe
 
-// Obtenemos el contenedor del modal y el punto de inserción
-const modalBody = document.querySelector("#add-to-cart-modal").parentElement;
+// Seleccionamos el cuerpo principal del modal
+const modalContainer = document.querySelector("#product-modal .product-modal-content");
 
-// La sección de instrucciones ya existe en el HTML
+// Buscamos la sección de instrucciones ya existente
 const instructionsSection = document.querySelector(".instructions-section");
 
 // Si el producto tiene configuración personalizada
@@ -355,10 +360,11 @@ if (product.config) {
   const configType = product.config.toLowerCase().trim();
   const customOptions = document.createElement("div");
   customOptions.id = "extra-options";
+  customOptions.style.marginTop = "10px";
 
   if (configType === "manualpizza") {
     customOptions.innerHTML = `
-      <h4 style="margin-bottom: 8px;">Personaliza tu pizza</h4>
+      <h4 style="margin-bottom: 8px;">🍕 Personaliza tu pizza</h4>
 
       <label style="font-weight: bold;">Tamaño:</label>
       <div id="pizza-size" style="margin-bottom: 10px;">
@@ -379,7 +385,7 @@ if (product.config) {
 
   else if (configType === "manualalmuerzo") {
     customOptions.innerHTML = `
-      <h4 style="margin-bottom: 8px;">Personaliza tu almuerzo</h4>
+      <h4 style="margin-bottom: 8px;">🍽️ Personaliza tu almuerzo</h4>
 
       <label style="font-weight: bold;">Proteína:</label>
       <div id="almuerzo-proteina" style="margin-bottom: 10px;">
@@ -406,12 +412,13 @@ if (product.config) {
     `;
   }
 
-  // ✅ Insertar las opciones personalizables justo antes de la sección de instrucciones
-  if (instructionsSection) {
-    modalBody.insertBefore(customOptions, instructionsSection);
+  // ✅ Insertar las opciones personalizables justo ANTES de la sección de instrucciones
+  if (instructionsSection && modalContainer) {
+    modalContainer.insertBefore(customOptions, instructionsSection);
   }
 }
 // 🔥 --- FIN DEL BLOQUE NUEVO ---
+
 
 
 // Show modal
@@ -428,6 +435,7 @@ function increaseQuantity() {
   modalQuantity++;
   document.getElementById("modal-quantity").textContent = modalQuantity;
   updateQuantityButtons();
+  updateAddToCartButton(); // 🔥 actualiza el precio del botón
 }
 
 function decreaseQuantity() {
@@ -435,13 +443,24 @@ function decreaseQuantity() {
     modalQuantity--;
     document.getElementById("modal-quantity").textContent = modalQuantity;
     updateQuantityButtons();
+    updateAddToCartButton(); // 🔥 actualiza el precio del botón
   }
 }
+
 
 function updateQuantityButtons() {
   const decreaseBtn = document.getElementById("decrease-btn");
   decreaseBtn.disabled = modalQuantity <= 1;
 }
+
+function updateAddToCartButton() {
+  if (!currentProduct) return;
+  const total = parseFloat(currentProduct.precio) * modalQuantity;
+  const button = document.getElementById("add-to-cart-modal");
+  button.innerHTML = `Agregar <span id="modal-product-price">${formatPrice(total)}</span>`;
+}
+
+
 
 function addToCartFromModal() {
   if (!currentProduct) return;
@@ -626,32 +645,39 @@ function renderCartItems() {
   }
 
   cartItemsEl.innerHTML = cart
-    .map(
-      (item) => `
-                <div class="cart-item">
-                    <div class="item-info">
-                        <div class="item-name">${item.name}</div>
-                        ${
-                          item.instructions
-                            ? `<div style="font-size: 0.8rem; color: #718096; font-style: italic; margin-top: 2px;">${item.instructions}</div>`
-                            : ""
-                        }
-                        <div class="item-price">${formatPrice(
-                          item.price
-                        )} c/u</div>
-                    </div>
-                    <div class="item-controls">
-                        <button class="quantity-btn" onclick="removeFromCart('${
-                          item.id
-                        }')">-</button>
-                        <span class="quantity">${item.quantity}</span>
-                        <button class="quantity-btn" onclick="addToCart('${
-                          item.id
-                        }')">+</button>
-                    </div>
-                </div>
-            `
-    )
+    .map((item) => {
+      // Buscar el producto original para obtener la imagen
+      const product = products.find(
+        (p) => p.id === item.originalId || p.id === item.id
+      );
+
+      const imageHTML = product?.imagen
+        ? `<img src="${product.imagen}" alt="${item.name}" class="cart-item-image" 
+             onerror="this.style.display='none';">`
+        : `<div class="cart-item-placeholder">🍽️</div>`;
+
+      return `
+        <div class="cart-item">
+          <div class="item-left">
+            ${imageHTML}
+            <div class="item-info">
+              <div class="item-name">${item.name}</div>
+              ${
+                item.instructions
+                  ? `<div class="item-instructions">${item.instructions}</div>`
+                  : ""
+              }
+              <div class="item-price">${formatPrice(item.price)} c/u</div>
+            </div>
+          </div>
+          <div class="item-controls">
+            <button class="quantity-btn" onclick="removeFromCart('${item.id}')">-</button>
+            <span class="quantity">${item.quantity}</span>
+            <button class="quantity-btn" onclick="addToCart('${item.id}')">+</button>
+          </div>
+        </div>
+      `;
+    })
     .join("");
 }
 
@@ -747,5 +773,63 @@ cartModalEl.addEventListener("click", function (e) {
 productModalEl.addEventListener("click", function (e) {
   if (e.target === productModalEl) {
     closeProductModal();
+  }
+});
+
+
+
+// ===========================
+// CATEGORÍAS SCROLLEABLES
+// ===========================
+function scrollToSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  const buttons = document.querySelectorAll('.category-btn');
+
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Actualizar visualmente el botón activo
+  buttons.forEach(btn => btn.classList.remove('active'));
+  const clickedButton = Array.from(buttons).find(btn =>
+    btn.getAttribute('onclick')?.includes(sectionId)
+  );
+  if (clickedButton) clickedButton.classList.add('active');
+}
+
+// ===========================
+// ACTUALIZAR BOTÓN ACTIVO EN SCROLL
+// ===========================
+window.addEventListener('scroll', () => {
+  const sections = document.querySelectorAll('section[id]');
+  const buttons = document.querySelectorAll('.category-btn');
+
+  let current = '';
+  const scrollY = window.scrollY;
+
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 150;
+    if (scrollY >= sectionTop) {
+      current = section.getAttribute('id');
+    }
+  });
+
+  buttons.forEach(btn => btn.classList.remove('active'));
+  const activeBtn = Array.from(buttons).find(btn =>
+    btn.getAttribute('onclick')?.includes(current)
+  );
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+
+    // Desplazar horizontalmente el contenedor si el botón queda fuera de vista
+    const categories = document.querySelector('.categories');
+    const btnRect = activeBtn.getBoundingClientRect();
+    const containerRect = categories.getBoundingClientRect();
+    if (btnRect.left < containerRect.left || btnRect.right > containerRect.right) {
+      categories.scrollTo({
+        left: activeBtn.offsetLeft - containerRect.width / 2 + activeBtn.offsetWidth / 2,
+        behavior: 'smooth'
+      });
+    }
   }
 });

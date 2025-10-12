@@ -53,7 +53,6 @@ function parseHour(v) {
 // ===============================
 async function loadSchedule() {
     const statusHeader = document.getElementById('status-header');
-    showCurrentDay();
 
     try {
         const controller = new AbortController();
@@ -88,14 +87,6 @@ async function loadSchedule() {
 // ===============================
 // VISUALIZACIÓN DE ESTADO
 // ===============================
-function showCurrentDay() {
-    const statusHeader = document.getElementById('status-header');
-    const today = new Date();
-    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const currentDay = days[today.getDay()];
-    statusHeader.innerHTML = `<div class="status-text">${currentDay}</div>`;
-}
-
 function displaySchedule(scheduleData) {
     const today = new Date();
     const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -115,48 +106,65 @@ function updateStatus(scheduleData, currentDay) {
 
     const [openHour, openMinute] = todaySchedule.open.split(':').map(Number);
     const [closeHour, closeMinute] = todaySchedule.close.split(':').map(Number);
-    const openTime = new Date(); openTime.setHours(openHour, openMinute, 0, 0);
-    const closeTime = new Date(); closeTime.setHours(closeHour, closeMinute, 0, 0);
+    const openTime = new Date();
+    openTime.setHours(openHour, openMinute, 0, 0);
+    const closeTime = new Date();
+    closeTime.setHours(closeHour, closeMinute, 0, 0);
 
+    // Si está abierta actualmente
     if (now >= openTime && now <= closeTime) {
         const timeUntilClose = closeTime - now;
         const hours = Math.floor(timeUntilClose / (1000 * 60 * 60));
         const minutes = Math.floor((timeUntilClose % (1000 * 60 * 60)) / (1000 * 60));
-        const closeText = hours > 0 ? `Cierra en ${hours} hora(s) ${minutes} minuto(s)` :
-            minutes > 0 ? `Cierra en ${minutes} minuto(s)` : `Cierra pronto.`;
+        const closeText =
+            hours > 0
+                ? `Cierra en ${hours} hora${hours > 1 ? 's' : ''} ${minutes} minuto${minutes !== 1 ? 's' : ''}`
+                : minutes > 0
+                ? `Cierra en ${minutes} minuto${minutes !== 1 ? 's' : ''}`
+                : `Cierra pronto.`;
         setOpen(statusHeader, '¡La tienda está abierta!', closeText);
+
+    // Si está cerrada actualmente
     } else {
         const nextOpen = new Date(openTime);
         if (now > openTime) nextOpen.setDate(nextOpen.getDate() + 1);
-        const timeUntilOpen = nextOpen - now;
-        const hours = Math.floor(timeUntilOpen / (1000 * 60 * 60));
-        const minutes = Math.floor((timeUntilOpen % (1000 * 60 * 60)) / (1000 * 60));
-        const openText = hours > 0 ? `Abre en ${hours}h ${minutes}m` :
-            minutes > 0 ? `Abre en ${minutes} minuto(s)` : `Abre pronto.`;
+
+        // Formato legible de hora (12h con AM/PM)
+        let openHours = openHour % 12 || 12;
+        const openMinutes = String(openMinute).padStart(2, '0');
+        const period = openHour >= 12 ? 'PM' : 'AM';
+        const openFormatted = `${openHours}:${openMinutes} ${period}`;
+
+        const openText = now > closeTime 
+    ? `Abre mañana a las ${openFormatted}` 
+    : `Abre a las ${openFormatted}`;
         setClosed(statusHeader, 'La tienda está cerrada.', openText);
     }
 }
 
+
 // ===============================
 // ESTILOS VISUALES DE ESTADO
 // ===============================
-function setOpen(el, text, subtext = '') {
-    el.classList.remove('closed');
-    el.classList.add('open');
-    el.innerHTML = `
-        <div class="status-text">${text}</div>
-        <div class="status-text time-remaining">${subtext}</div>
-    `;
+function setOpen(el, title, subtitle = '') {
+  const subtext = document.getElementById('status-subtext');
+  el.style.setProperty('--status-bg', '#2ecc71'); // verde
+  el.style.setProperty('--text-color', '#fff');
+  
+  el.textContent = title; // Solo el texto principal
+  subtext.textContent = subtitle; // Subtexto aparte
 }
 
-function setClosed(el, text, subtext = '') {
-    el.classList.remove('open');
-    el.classList.add('closed');
-    el.innerHTML = `
-        <div class="status-text">${text}</div>
-        ${subtext ? `<div class="status-text time-remaining">${subtext}</div>` : ''}
-    `;
+function setClosed(el, title, subtitle = '') {
+  const subtext = document.getElementById('status-subtext');
+  el.style.setProperty('--status-bg', '#e74c3c'); // rojo
+  el.style.setProperty('--text-color', '#fff');
+  
+  el.textContent = title;
+  subtext.textContent = subtitle;
 }
+
+
 
 // ===============================
 // EJECUCIÓN AUTOMÁTICA
