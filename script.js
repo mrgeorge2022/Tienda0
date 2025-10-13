@@ -795,7 +795,7 @@ window.addEventListener("scroll", () => {
 
   // Detectar la sección visible
   sections.forEach(section => {
-    const sectionTop = section.offsetTop - 160;
+    const sectionTop = section.offsetTop - 330;
     if (scrollY >= sectionTop) current = section.getAttribute("id");
   });
 
@@ -848,4 +848,5 @@ cartModalEl.addEventListener("click", e => {
 productModalEl.addEventListener("click", e => {
   if (e.target === productModalEl) closeProductModal();
 });
+
 
