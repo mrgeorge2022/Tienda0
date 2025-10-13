@@ -34,6 +34,8 @@
 
 html {
     height: 100%;
+    -webkit-text-size-adjust: 100%; /* evita zoom inesperado */
+    scroll-behavior: smooth;
 }
 
 * {
@@ -58,7 +60,25 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+    min-height: 100vh;
+    min-height: 100dvh; /* Safari y Chrome modernos */
+
 }
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.25);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body > * {
+    position: relative;
+    z-index: 1;
+}
+
 
 /* =========================================
    HEADER PRINCIPAL
@@ -173,6 +193,7 @@ body {
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 600px) {
     .header {
+        padding: 0;
         flex-direction: column;
         text-align: center;
         gap: 10px;
@@ -200,6 +221,7 @@ body {
   background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* ✅ soporte Safari */
   transition: top 0.4s ease, opacity 0.3s ease;
   z-index: 1000;
   opacity: 0;

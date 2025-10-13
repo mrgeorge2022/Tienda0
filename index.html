@@ -2,276 +2,274 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mr. George | Restaurante</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mr. George | Restaurante</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<div class="container">
-  <div class="header">
-    <div class="header-left">
-      <img src="img/icono_tienda.png" alt="Logo" class="header-logo">
-      <div class="header-info">
-        <h1>Mr. George</h1>
-        <div id="status-header"></div>   <!-- Estado principal -->
-        <div id="status-subtext"></div>  <!-- Texto informativo -->
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <img src="img/icono_tienda.png" alt="Logo" class="header-logo">
+        <div class="header-info">
+          <h1>Mr. George</h1>
+          <div id="status-header"></div> <!-- Estado principal -->
+          <div id="status-subtext"></div> <!-- Texto informativo -->
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
 
 
 
 
-<!-- Navigation -->
-<div class="categories">
-  <button class="category-btn active" onclick="scrollToSection('todos'); loadProducts();">🌟 Todos</button>
-  <button class="category-btn" onclick="scrollToSection('almuerzos')">🍛 Almuerzos</button>
-  <button class="category-btn" onclick="scrollToSection('perros')">🌭 Perros</button>
-  <button class="category-btn" onclick="scrollToSection('hamburguesas')">🍔 Hamburguesas</button>
-  <button class="category-btn" onclick="scrollToSection('salchipapas')">🍟 Salchipapas</button>
-  <button class="category-btn" onclick="scrollToSection('picadas')">🍖 Picadas</button>
-  <button class="category-btn" onclick="scrollToSection('pizzas')">🍕 Pizzas</button>
-  <button class="category-btn" onclick="scrollToSection('bebidas')">🥤 Bebidas</button>
-  <button class="category-btn" onclick="scrollToSection('acompanantes')">🍴 Acompañantes</button>
-</div>
+  <!-- Navigation -->
+  <div class="categories">
+    <button class="category-btn active" onclick="scrollToSection('todos'); loadProducts();">🌟 Todos</button>
+    <button class="category-btn" onclick="scrollToSection('almuerzos')">🍛 Almuerzos</button>
+    <button class="category-btn" onclick="scrollToSection('perros')">🌭 Perros</button>
+    <button class="category-btn" onclick="scrollToSection('hamburguesas')">🍔 Hamburguesas</button>
+    <button class="category-btn" onclick="scrollToSection('salchipapas')">🍟 Salchipapas</button>
+    <button class="category-btn" onclick="scrollToSection('picadas')">🍖 Picadas</button>
+    <button class="category-btn" onclick="scrollToSection('pizzas')">🍕 Pizzas</button>
+    <button class="category-btn" onclick="scrollToSection('bebidas')">🥤 Bebidas</button>
+    <button class="category-btn" onclick="scrollToSection('acompanantes')">🍴 Acompañantes</button>
+  </div>
 
 
 
 
-    <!-- Skeletal Loading -->
-    <div class="skeleton-container" id="skeleton-loading" style="display: none;">
-        <div class="skeleton-card">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-text skeleton-title"></div>
-            <div class="skeleton-text skeleton-price"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-button"></div>
+  <!-- Skeletal Loading -->
+  <div class="skeleton-container" id="skeleton-loading" style="display: none;">
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-text skeleton-price"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-button"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-text skeleton-price"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-button"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-text skeleton-price"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-button"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-text skeleton-price"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-button"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-text skeleton-price"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-button"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-text skeleton-title"></div>
+      <div class="skeleton-text skeleton-price"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-description"></div>
+      <div class="skeleton-text skeleton-button"></div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" id="error-message" style="display: none;">
+    Error al cargar los productos. Por favor, verifica la configuración de Google Sheets.
+  </div>
+  <!-- Menu Sections -->
+  <div class="menu-sections">
+
+    <!-- Almuerzos Section -->
+    <section id="almuerzos" class="menu-section">
+      <h2 class="section-title">🍛 Almuerzos</h2>
+      <div class="products-grid" id="almuerzos-grid"></div>
+    </section>
+
+    <!-- Perros Section -->
+    <section id="perros" class="menu-section">
+      <h2 class="section-title">🌭 Perros</h2>
+      <div class="products-grid" id="perros-grid"></div>
+    </section>
+
+    <!-- Hamburguesas Section -->
+    <section id="hamburguesas" class="menu-section">
+      <h2 class="section-title">🍔 Hamburguesas</h2>
+      <div class="products-grid" id="hamburguesas-grid"></div>
+    </section>
+
+    <!-- Salchipapas Section -->
+    <section id="salchipapas" class="menu-section">
+      <h2 class="section-title">🍟 Salchipapas</h2>
+      <div class="products-grid" id="salchipapas-grid"></div>
+    </section>
+
+    <!-- Picadas Section -->
+    <section id="picadas" class="menu-section">
+      <h2 class="section-title">🍖 Picadas</h2>
+      <div class="products-grid" id="picadas-grid"></div>
+    </section>
+
+    <!-- Pizzas Section -->
+    <section id="pizzas" class="menu-section">
+      <h2 class="section-title">🍕 Pizzas</h2>
+      <div class="products-grid" id="pizzas-grid"></div>
+    </section>
+
+    <!-- Bebidas Section -->
+    <section id="bebidas" class="menu-section">
+      <h2 class="section-title">🥤 Bebidas</h2>
+      <div class="products-grid" id="bebidas-grid"></div>
+    </section>
+
+    <!-- Acompañantes Section -->
+    <section id="acompanantes" class="menu-section">
+      <h2 class="section-title">🍴 Acompañantes</h2>
+      <div class="products-grid" id="acompanantes-grid"></div>
+    </section>
+
+  </div>
+
+
+  <!-- Floating Cart -->
+  <div class="cart-float" id="cart-float" onclick="openCart()">
+    <div class="cart-icon">🛒</div>
+    <div class="cart-info">
+      <div class="cart-count" id="cart-count">0 productos</div>
+      <div class="cart-total" id="cart-total">$0</div>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div class="product-modal" id="product-modal">
+    <div class="product-modal-content">
+      <div class="product-modal-header">
+        <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
+        <button class="close-product-modal" onclick="closeProductModal()">×</button>
+      </div>
+
+      <div class="product-modal-image" id="modal-product-image">
+        🍽️
+      </div>
+
+      <div class="product-modal-price" id="modal-product-price">$0</div>
+
+      <div class="product-modal-description" id="modal-product-description">
+        Descripción del producto
+      </div>
+
+
+      <div class="instructions-section">
+        <label class="instructions-label" for="product-instructions">
+          Instrucciones especiales (opcional):
+        </label>
+        <textarea id="product-instructions" class="instructions-textarea"
+          placeholder="Ej: Sin cebolla, extra queso, término medio..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <div class="quantity-section">
+          <div class="quantity-control">
+            <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
+            <span class="quantity-display" id="modal-quantity">1</span>
+            <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
+          </div>
         </div>
-        <div class="skeleton-card">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-text skeleton-title"></div>
-            <div class="skeleton-text skeleton-price"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-button"></div>
-        </div>
-        <div class="skeleton-card">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-text skeleton-title"></div>
-            <div class="skeleton-text skeleton-price"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-button"></div>
-        </div>
-        <div class="skeleton-card">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-text skeleton-title"></div>
-            <div class="skeleton-text skeleton-price"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-button"></div>
-        </div>
-        <div class="skeleton-card">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-text skeleton-title"></div>
-            <div class="skeleton-text skeleton-price"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-button"></div>
-        </div>
-        <div class="skeleton-card">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-text skeleton-title"></div>
-            <div class="skeleton-text skeleton-price"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-description"></div>
-            <div class="skeleton-text skeleton-button"></div>
-        </div>
-    </div>
 
-    <!-- Error Message -->
-    <div class="error-message" id="error-message" style="display: none;">
-        Error al cargar los productos. Por favor, verifica la configuración de Google Sheets.
-    </div>
-    <!-- Menu Sections -->
-    <div class="menu-sections">
-
-        <!-- Almuerzos Section -->
-        <section id="almuerzos" class="menu-section">
-            <h2 class="section-title">🍛 Almuerzos</h2>
-            <div class="products-grid" id="almuerzos-grid"></div>
-        </section>
-
-        <!-- Perros Section -->
-        <section id="perros" class="menu-section">
-            <h2 class="section-title">🌭 Perros</h2>
-            <div class="products-grid" id="perros-grid"></div>
-        </section>
-
-        <!-- Hamburguesas Section -->
-        <section id="hamburguesas" class="menu-section">
-            <h2 class="section-title">🍔 Hamburguesas</h2>
-            <div class="products-grid" id="hamburguesas-grid"></div>
-        </section>
-
-        <!-- Salchipapas Section -->
-        <section id="salchipapas" class="menu-section">
-            <h2 class="section-title">🍟 Salchipapas</h2>
-            <div class="products-grid" id="salchipapas-grid"></div>
-        </section>
-
-        <!-- Picadas Section -->
-        <section id="picadas" class="menu-section">
-            <h2 class="section-title">🍖 Picadas</h2>
-            <div class="products-grid" id="picadas-grid"></div>
-        </section>
-
-        <!-- Pizzas Section -->
-        <section id="pizzas" class="menu-section">
-            <h2 class="section-title">🍕 Pizzas</h2>
-            <div class="products-grid" id="pizzas-grid"></div>
-        </section>
-
-        <!-- Bebidas Section -->
-        <section id="bebidas" class="menu-section">
-            <h2 class="section-title">🥤 Bebidas</h2>
-            <div class="products-grid" id="bebidas-grid"></div>
-        </section>
-
-        <!-- Acompañantes Section -->
-        <section id="acompanantes" class="menu-section">
-            <h2 class="section-title">🍴 Acompañantes</h2>
-            <div class="products-grid" id="acompanantes-grid"></div>
-        </section>
-
-    </div>
-
-
-    <!-- Floating Cart -->
-    <div class="cart-float" id="cart-float" onclick="openCart()">
-        <div class="cart-icon">🛒</div>
-        <div class="cart-info">
-            <div class="cart-count" id="cart-count">0 productos</div>
-            <div class="cart-total" id="cart-total">$0</div>
-        </div>
-    </div>
-
-    <!-- Product Modal -->
-    <div class="product-modal" id="product-modal">
-        <div class="product-modal-content">
-            <div class="product-modal-header">
-                <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
-                <button class="close-product-modal" onclick="closeProductModal()">×</button>
-            </div>
-
-            <div class="product-modal-image" id="modal-product-image">
-                🍽️
-            </div>
-
-            <div class="product-modal-price" id="modal-product-price">$0</div>
-
-            <div class="product-modal-description" id="modal-product-description">
-                Descripción del producto
-            </div>
-
-
-            <div class="instructions-section">
-                <label class="instructions-label" for="product-instructions">
-                    Instrucciones especiales (opcional):
-                </label>
-                <textarea id="product-instructions" class="instructions-textarea"
-                    placeholder="Ej: Sin cebolla, extra queso, término medio..."></textarea>
-            </div>
-
-            <div class="modal-actions">
-            <div class="quantity-section">
-                <div class="quantity-control">
-                    <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
-                    <span class="quantity-display" id="modal-quantity">1</span>
-                    <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
-                </div>
-            </div>
-
-            <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
-                Agregar al carrito
-            </button>
-        </div>
-    </div>
-    </div>
-
-<!-- Cart Modal -->
-<div class="cart-modal" id="cart-modal">
-  <div class="cart-content">
-    <div class="cart-header">
-      <h3 class="cart-title">Tu Pedido</h3>
-      <button class="close-cart" onclick="closeCart()">×</button>
-    </div>
-
-    <div class="cart-items" id="cart-items">
-      <!-- Cart items will be inserted here -->
-    </div>
-
-    <!-- 📝 Observaciones generales -->
-    <div class="cart-observations">
-      <label for="cart-notes" class="cart-observations-label">Observaciones generales:</label>
-      <textarea
-        id="cart-notes"
-        class="cart-observations-textarea"
-        placeholder="Ej: Sin picante, agregar servilletas, entregar en portería..."
-      ></textarea>
-    </div>
-
-    <div class="cart-summary">
-      <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
-      <div class="cart-actions">
-        <button class="cart-btn clear-cart" onclick="clearCart()">Vaciar</button>
-        <button class="cart-btn checkout-btn" onclick="checkout()">Pedir</button>
+        <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
+          Agregar al carrito
+        </button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- === FOOTER INFO === -->
-<footer class="footer-info">
-  <div class="footer-socials">
-    <a href="https://wa.me/573001234567" target="_blank" class="social-link">
-      <img src="iconos/redes/whatsapp.png" alt="WhatsApp">
-    </a>
-    <a href="https://www.facebook.com/mrgeorge" target="_blank" class="social-link">
-      <img src="iconos/redes/facebook.png" alt="Facebook">
-    </a>
-    <a href="https://www.instagram.com/mrgeorge" target="_blank" class="social-link">
-      <img src="iconos/redes/instagram.png" alt="Instagram">
-    </a>
+  <!-- Cart Modal -->
+  <div class="cart-modal" id="cart-modal">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h3 class="cart-title">Tu Pedido</h3>
+        <button class="close-cart" onclick="closeCart()">×</button>
+      </div>
+
+      <div class="cart-items" id="cart-items">
+        <!-- Cart items will be inserted here -->
+      </div>
+
+      <!-- 📝 Observaciones generales -->
+      <div class="cart-observations">
+        <label for="cart-notes" class="cart-observations-label">Observaciones generales:</label>
+        <textarea id="cart-notes" class="cart-observations-textarea"
+          placeholder="Ej: Sin picante, agregar servilletas, entregar en portería..."></textarea>
+      </div>
+
+      <div class="cart-summary">
+        <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
+        <div class="cart-actions">
+          <button class="cart-btn clear-cart" onclick="clearCart()">Vaciar</button>
+          <button class="cart-btn checkout-btn" onclick="checkout()">Pedir</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="footer-qr">
-    <img src="img/QR tienda.png" alt="QR Mr. George">
-  </div>
+  <!-- === FOOTER INFO === -->
+  <footer class="footer-info">
+    <div class="footer-socials">
+      <a href="https://wa.me/573001234567" target="_blank" class="social-link">
+        <img src="iconos/redes/whatsapp.png" alt="WhatsApp">
+      </a>
+      <a href="https://www.facebook.com/mrgeorge" target="_blank" class="social-link">
+        <img src="iconos/redes/facebook.png" alt="Facebook">
+      </a>
+      <a href="https://www.instagram.com/mrgeorge" target="_blank" class="social-link">
+        <img src="iconos/redes/instagram.png" alt="Instagram">
+      </a>
+    </div>
 
-  <div class="footer-branches">
-<p><strong>Sedes</strong><br>
+    <div class="footer-qr">
+      <img src="img/QR tienda.png" alt="QR Mr. George">
+    </div>
+
+    <div class="footer-branches">
+      <p><strong>Sedes</strong><br>
         Mr. George Cartagena, Bolivar<br>
         San fernando, Cl 5, Cra 81 f 05<br>
         <span class="telefono">(+57) 302 266 6530</span>
-</p>
-  </div>
+      </p>
+    </div>
 
-  <div class="footer-policies">
-    <a href="terminos.html" target="_blank">Términos y condiciones</a>
-    <a href="politicas.html" target="_blank">Políticas de privacidad</a>
-  </div>
-</footer>
+    <div class="footer-policies">
+      <a href="terminos.html" target="_blank">Términos y condiciones</a>
+      <a href="politicas.html" target="_blank">Políticas de privacidad</a>
+    </div>
+  </footer>
 
 
 
-    <script src="horario.js"></script>
-    <script src="script.js"></script>
+  <script src="horario.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>
