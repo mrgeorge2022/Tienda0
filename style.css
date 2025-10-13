@@ -181,20 +181,25 @@ body {
 /* Categories Sticky & Scrollable */
 .categories {
     position: sticky;
-    top: 15px; /* Fija la barra arriba */
-    z-index: 50; /* Asegura que quede sobre el contenido */
+    top: 0;
+    z-index: 100; /* Asegura que quede por encima de todo */
     display: flex;
     gap: 15px;
     overflow-x: auto;
     white-space: nowrap;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
-    background: var(--background, #fff); /* Fondo sólido al hacer scroll */
+
+    /* ✅ Fondo sólido con sutil sombra y blur */
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
     padding: 12px 10px;
     margin-bottom: 25px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
+
 
 
 .categories::-webkit-scrollbar {
