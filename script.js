@@ -569,7 +569,7 @@ function addToCartFromModal() {
     button.textContent = originalText;
     button.style.background = "";
     closeProductModal();
-  }, 1000);
+  }, 500);
 }
 
 // Cart functions
@@ -723,113 +723,129 @@ function checkout() {
   closeCart();
 }
 
-// Scroll to section function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ==================================================
+// ✅ SCROLL CATEGORÍAS MEJORADO Y COMPATIBLE
+// ==================================================
+
+let manualScroll = false;
+let scrollTimeout = null;
+
 function scrollToSection(sectionId) {
-  // remover active de todos los botones
-  categoryBtns.forEach((btn) => btn.classList.remove("active"));
-
-  // intentar encontrar el botón que tiene como texto la sección (si existe)
-  let clickedBtn = Array.from(categoryBtns).find((b) => b.getAttribute('onclick') && b.getAttribute('onclick').includes(sectionId));
-  if (!clickedBtn) {
-    // fallback: usar el primer botón
-    clickedBtn = categoryBtns[0];
-  }
-  if (clickedBtn) clickedBtn.classList.add('active');
-
-  if (sectionId === "todos") {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return;
-  }
-
   const section = document.getElementById(sectionId);
-  if (section) section.scrollIntoView({ behavior: "smooth" });
+  const buttons = document.querySelectorAll(".category-btn");
+
+  // Indica que el movimiento viene de un clic manual
+  manualScroll = true;
+  clearTimeout(scrollTimeout);
+
+  // Actualizar el botón activo
+  buttons.forEach(btn => btn.classList.remove("active"));
+  const clickedButton = Array.from(buttons).find(btn =>
+    btn.getAttribute("onclick")?.includes(sectionId)
+  );
+  if (clickedButton) clickedButton.classList.add("active");
+
+// 🟩 Hacer scroll a la sección (dejando espacio por el header fijo)
+if (sectionId === "todos") {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+} else if (section) {
+  const headerOffset = 210; // ajusta si tu header es más alto o más bajo
+  const elementPosition = section.getBoundingClientRect().top + window.pageYOffset;
+  const offsetPosition = elementPosition - headerOffset;
+  window.scrollTo({ top: offsetPosition, behavior: "smooth" });
 }
 
-// Show/hide loading state
+
+  // Después de 800ms, vuelve a modo automático
+  scrollTimeout = setTimeout(() => (manualScroll = false), 800);
+}
+
+// ==================================================
+// 🔹 ACTUALIZAR BOTÓN ACTIVO EN SCROLL
+// ==================================================
+window.addEventListener("scroll", () => {
+  if (manualScroll) return; // no hacer nada si el scroll fue manual
+
+  const sections = document.querySelectorAll("section[id]");
+  const buttons = document.querySelectorAll(".category-btn");
+  let current = "";
+  const scrollY = window.scrollY;
+
+  // Detectar la sección visible
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 160;
+    if (scrollY >= sectionTop) current = section.getAttribute("id");
+  });
+
+  // Actualizar el botón activo
+  buttons.forEach(btn => btn.classList.remove("active"));
+  const activeBtn = Array.from(buttons).find(btn =>
+    btn.getAttribute("onclick")?.includes(current)
+  );
+  if (activeBtn) {
+    activeBtn.classList.add("active");
+
+    // Centrar el botón activo si el contenedor es horizontal
+    const categories = document.querySelector(".categories");
+    if (categories) {
+      const btnRect = activeBtn.getBoundingClientRect();
+      const containerRect = categories.getBoundingClientRect();
+      if (btnRect.left < containerRect.left || btnRect.right > containerRect.right) {
+        categories.scrollTo({
+          left: activeBtn.offsetLeft - containerRect.width / 2 + activeBtn.offsetWidth / 2,
+          behavior: "smooth",
+        });
+      }
+    }
+  }
+});
+
+// ==================================================
+// 🔹 UTILIDADES DE ESTADO (loading / error)
+// ==================================================
 function showLoading(show) {
   skeletonLoadingEl.style.display = show ? "grid" : "none";
-  document.querySelector(".menu-sections").style.display = show
-    ? "none"
-    : "block";
+  document.querySelector(".menu-sections").style.display = show ? "none" : "block";
 }
 
-// Show error message
 function showError() {
   errorEl.style.display = "block";
 }
 
-// Hide error message
 function hideError() {
   errorEl.style.display = "none";
 }
 
-// Close modals when clicking outside
-cartModalEl.addEventListener("click", function (e) {
-  if (e.target === cartModalEl) {
-    closeCart();
-  }
+// ==================================================
+// 🔹 CIERRE DE MODALES AL HACER CLICK FUERA
+// ==================================================
+cartModalEl.addEventListener("click", e => {
+  if (e.target === cartModalEl) closeCart();
 });
 
-productModalEl.addEventListener("click", function (e) {
-  if (e.target === productModalEl) {
-    closeProductModal();
-  }
+productModalEl.addEventListener("click", e => {
+  if (e.target === productModalEl) closeProductModal();
 });
 
-
-
-// ===========================
-// CATEGORÍAS SCROLLEABLES
-// ===========================
-function scrollToSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  const buttons = document.querySelectorAll('.category-btn');
-
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  // Actualizar visualmente el botón activo
-  buttons.forEach(btn => btn.classList.remove('active'));
-  const clickedButton = Array.from(buttons).find(btn =>
-    btn.getAttribute('onclick')?.includes(sectionId)
-  );
-  if (clickedButton) clickedButton.classList.add('active');
-}
-
-// ===========================
-// ACTUALIZAR BOTÓN ACTIVO EN SCROLL
-// ===========================
-window.addEventListener('scroll', () => {
-  const sections = document.querySelectorAll('section[id]');
-  const buttons = document.querySelectorAll('.category-btn');
-
-  let current = '';
-  const scrollY = window.scrollY;
-
-  sections.forEach(section => {
-    const sectionTop = section.offsetTop - 150;
-    if (scrollY >= sectionTop) {
-      current = section.getAttribute('id');
-    }
-  });
-
-  buttons.forEach(btn => btn.classList.remove('active'));
-  const activeBtn = Array.from(buttons).find(btn =>
-    btn.getAttribute('onclick')?.includes(current)
-  );
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-
-    // Desplazar horizontalmente el contenedor si el botón queda fuera de vista
-    const categories = document.querySelector('.categories');
-    const btnRect = activeBtn.getBoundingClientRect();
-    const containerRect = categories.getBoundingClientRect();
-    if (btnRect.left < containerRect.left || btnRect.right > containerRect.right) {
-      categories.scrollTo({
-        left: activeBtn.offsetLeft - containerRect.width / 2 + activeBtn.offsetWidth / 2,
-        behavior: 'smooth'
-      });
-    }
-  }
-});

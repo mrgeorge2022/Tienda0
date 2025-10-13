@@ -4,13 +4,13 @@
 const SCHEDULE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOCBCR_1CsQJz9YljFyiL3YxgnvlUy_eEQMSmmIf9jvsCt0aO0RjoUD0yfTbq1_liXXQ/exec';
 
 const defaultSchedule = [
-    { day: 'Lunes', open: '00:00', close: '23:59', estado: true },
-    { day: 'Martes', open: '00:00', close: '23:59', estado: true },
-    { day: 'Miércoles', open: '00:00', close: '23:59', estado: true },
-    { day: 'Jueves', open: '00:00', close: '23:59', estado: true },
-    { day: 'Viernes', open: '00:00', close: '23:59', estado: true },
-    { day: 'Sábado', open: '00:00', close: '23:59', estado: true },
-    { day: 'Domingo', open: '00:00', close: '23:59', estado: true }
+    { day: 'Lunes', open: '11:00', close: '23:59', estado: true },
+    { day: 'Martes', open: '11:00', close: '23:59', estado: true },
+    { day: 'Miércoles', open: '11:00', close: '23:59', estado: false },
+    { day: 'Jueves', open: '11:00', close: '23:59', estado: true },
+    { day: 'Viernes', open: '11:00', close: '23:59', estado: true },
+    { day: 'Sábado', open: '11:00', close: '23:59', estado: true },
+    { day: 'Domingo', open: '11:00', close: '23:59', estado: true }
 ];
 
 // ===============================
