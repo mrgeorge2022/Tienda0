@@ -5,147 +5,148 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Mr. George | Restaurante</title>
+    <link rel="icon" type="image/png" href="img/icono_tienda.png">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<!-- HEADER + CATEGORÍAS combinados -->
-<header class="header-wrapper">
-  <div class="header">
-    <div class="header-left">
-      <img src="img/icono_tienda.png" alt="Logo" class="header-logo">
-      <div class="header-info">
-        <h1>Mr. George</h1>
-        <div id="status-header"></div>
-        <div id="status-subtext"></div>
+  <!-- HEADER + CATEGORÍAS combinados -->
+  <header class="header-wrapper">
+    <div class="header">
+      <div class="header-left">
+        <img src="img/icono_tienda.png" alt="Logo" class="header-logo">
+        <div class="header-info">
+          <h1>Mr. George</h1>
+          <div id="status-header"></div>
+          <div id="status-subtext"></div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="categories">
+      <button class="category-btn active" onclick="scrollToSection('todos')">🌟 Todos</button>
+      <button class="category-btn" onclick="scrollToSection('almuerzos')">🍛 Almuerzos</button>
+      <button class="category-btn" onclick="scrollToSection('perros')">🌭 Perros</button>
+      <button class="category-btn" onclick="scrollToSection('hamburguesas')">🍔 Hamburguesas</button>
+      <button class="category-btn" onclick="scrollToSection('salchipapas')">🍟 Salchipapas</button>
+      <button class="category-btn" onclick="scrollToSection('picadas')">🍖 Picadas</button>
+      <button class="category-btn" onclick="scrollToSection('pizzas')">🍕 Pizzas</button>
+      <button class="category-btn" onclick="scrollToSection('bebidas')">🥤 Bebidas</button>
+      <button class="category-btn" onclick="scrollToSection('acompanantes')">🍴 Acompañantes</button>
+    </nav>
+  </header>
+
+
+
+
+
+  <!-- 🦴 Skeletal Loading -->
+  <div class="skeleton-container" id="skeleton-loading" style="display: none;">
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
       </div>
     </div>
   </div>
 
-  <nav class="categories">
-    <button class="category-btn active" onclick="scrollToSection('todos')">🌟 Todos</button>
-    <button class="category-btn" onclick="scrollToSection('almuerzos')">🍛 Almuerzos</button>
-    <button class="category-btn" onclick="scrollToSection('perros')">🌭 Perros</button>
-    <button class="category-btn" onclick="scrollToSection('hamburguesas')">🍔 Hamburguesas</button>
-    <button class="category-btn" onclick="scrollToSection('salchipapas')">🍟 Salchipapas</button>
-    <button class="category-btn" onclick="scrollToSection('picadas')">🍖 Picadas</button>
-    <button class="category-btn" onclick="scrollToSection('pizzas')">🍕 Pizzas</button>
-    <button class="category-btn" onclick="scrollToSection('bebidas')">🥤 Bebidas</button>
-    <button class="category-btn" onclick="scrollToSection('acompanantes')">🍴 Acompañantes</button>
-  </nav>
-</header>
-
-
-
-
-
-<!-- 🦴 Skeletal Loading -->
-<div class="skeleton-container" id="skeleton-loading" style="display: none;">
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-
-  <div class="skeleton-card">
-    <div class="skeleton-image"></div>
-    <div class="skeleton-info">
-      <div class="skeleton-line skeleton-title"></div>
-      <div class="skeleton-line skeleton-price"></div>
-      <div class="skeleton-line skeleton-description"></div>
-      <div class="skeleton-line skeleton-description"></div>
-    </div>
-  </div>
-</div>
-
 
   <!-- Error Message -->
   <div class="error-message" id="error-message" style="display: none;">
-    Error al cargar los productos. Por favor, verifica la configuración de Google Sheets.
+    Error al cargar los productos. Por favor, actualiza la página.
   </div>
   <!-- Menu Sections -->
   <div class="menu-sections">
@@ -201,14 +202,6 @@
   </div>
 
 
-  <!-- Floating Cart -->
-  <div class="cart-float" id="cart-float" onclick="openCart()">
-    <div class="cart-icon">🛒</div>
-    <div class="cart-info">
-      <div class="cart-count" id="cart-count">0 productos</div>
-      <div class="cart-total" id="cart-total">$0</div>
-    </div>
-  </div>
 
   <!-- Product Modal -->
   <div class="product-modal" id="product-modal">
@@ -218,11 +211,17 @@
         <button class="close-product-modal" onclick="closeProductModal()">×</button>
       </div>
 
-      <div class="product-modal-image" id="modal-product-image">
-        🍽️
-      </div>
+<div class="modal-image-container">
+  <!-- Precio arriba -->
+  <div class="modal-price-overlay" id="modal-product-price">$0</div>
 
-      <div class="product-modal-price" id="modal-product-price">$0</div>
+  <!-- Imagen del producto (donde JS inserta la imagen dinámica) -->
+  <div class="product-modal-image" id="modal-image-content">
+    🍽️
+  </div>
+</div>
+
+
 
       <div class="product-modal-description" id="modal-product-description">
         Descripción del producto
@@ -273,7 +272,14 @@
       </div>
 
       <div class="cart-summary">
-        <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
+        <div class="payment-method">
+          <select id="payment-method" class="cart-payment-select">
+            <option value="Efectivo">💵 Efectivo</option>
+            <option value="Transferencia">💳 Transferencia</option>
+            <option value="Efectivo/Transferencia">💰 Efectivo / Transferencia</option>
+          </select>
+          <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
+        </div>
         <div class="cart-actions">
           <button class="cart-btn clear-cart" onclick="clearCart()">Vaciar</button>
           <button class="cart-btn checkout-btn" onclick="checkout()">Pedir</button>
@@ -281,6 +287,19 @@
       </div>
     </div>
   </div>
+
+
+  <!-- Floating Cart -->
+  <div class="cart-float" id="cart-float" onclick="openCart()">
+    <div class="cart-icon">
+      <img src="iconos/carrito.png" alt="Carrito">
+    </div>
+    <div class="cart-info">
+      <div class="cart-count" id="cart-count">0 productos</div>
+      <div class="cart-total" id="cart-total">$0</div>
+    </div>
+  </div>
+
 
   <!-- === FOOTER INFO === -->
   <footer class="footer-info">
@@ -307,17 +326,31 @@
         <span class="telefono">(+57) 302 266 6530</span>
       </p>
     </div>
-    
+
 
     <div class="footer-policies">
       <a href="terminos.html" target="_blank">Términos y condiciones</a>
       <a href="politicas.html" target="_blank">Políticas de privacidad</a>
     </div>
+
+    <div class="footer-content">
+      <div>
+        <img src="img/logo.png" alt="Logo Mr. George" class="footer-logo">
+      </div>
+
+      <div class="create-store">
+        <a href="https://wa.me/573001112233?text=Quiero%20crear%20mi%20tienda" target="_blank" class="create-store-btn">
+          Crea tu tienda aquí
+        </a>
+      </div>
+
+
   </footer>
 
 
 
   <script src="horario.js"></script>
+  <script src="productos-variable.js"></script>
   <script src="script.js"></script>
 </body>
 

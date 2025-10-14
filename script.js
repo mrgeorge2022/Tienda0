@@ -12,7 +12,6 @@ let cart = [];
 let currentProduct = null;
 let modalQuantity = 1;
 
-
 // DOM Elements
 const skeletonLoadingEl = document.getElementById("skeleton-loading");
 const errorEl = document.getElementById("error-message");
@@ -22,15 +21,24 @@ const cartModalEl = document.getElementById("cart-modal");
 const productModalEl = document.getElementById("product-modal");
 
 // Initialize app
+/**
+ * Inicializa la aplicación cuando el DOM está listo.
+ * Actualmente llama a `loadProducts` para cargar los productos desde Google Sheets.
+ */
 document.addEventListener("DOMContentLoaded", function () {
   loadProducts();
 });
 
 // Nota: la lógica de horario fue eliminada; la tienda siempre permite interacción local
 
-
-
 // ✅ Actualiza botones de productos
+/**
+ * updateProductButtons
+ * --------------------
+ * Actualiza el aspecto de los botones "+" en las tarjetas de producto.
+ * Nota: el botón es puramente visual aquí; la lógica de disponibilidad
+ * real viene de la propiedad `product.activo`.
+ */
 function updateProductButtons() {
   const addButtons = document.querySelectorAll(".add-button");
   addButtons.forEach((btn) => {
@@ -44,6 +52,14 @@ function updateProductButtons() {
 }
 
 // Load products from Google Sheets
+/**
+ * loadProducts
+ * ------------
+ * Hace una petición al Web App de Google Apps Script solicitando la
+ * hoja `Productos`. Soporta respuestas JSON, JSONP o arrays de filas
+ * (array de arrays). Normaliza las claves y construye el array `products`.
+ * Muestra mensajes de error en la UI si la carga falla o no hay datos.
+ */
 async function loadProducts() {
   try {
     showLoading(true);
@@ -54,7 +70,7 @@ async function loadProducts() {
     // Clonar y registrar texto crudo para depuración (no afecta al parseo)
     const rawText = await response.clone().text();
     try {
-      console.groupCollapsed('Carga productos - respuesta cruda');
+      console.groupCollapsed("Carga productos - respuesta cruda");
       console.log(rawText.slice(0, 2000));
       console.groupEnd();
     } catch (e) {}
@@ -82,17 +98,17 @@ async function loadProducts() {
 
     // Asegurar que sea un array de objetos
     if (!Array.isArray(data)) {
-      console.error('La respuesta de productos no es un array:', data);
-      throw new Error('Formato de datos de productos inesperado');
+      console.error("La respuesta de productos no es un array:", data);
+      throw new Error("Formato de datos de productos inesperado");
     }
 
     // Normalizar claves comunes (minusculas) y tipos
     // Helper: normalizar clave (quita acentos, espacios y pasa a minusculas)
     const normalizeKey = (k) =>
-      String(k || '')
-        .normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '')
-        .replace(/\s+/g, '')
+      String(k || "")
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .replace(/\s+/g, "")
         .toLowerCase();
 
     products = data.map((row, idx) => {
@@ -111,22 +127,45 @@ async function loadProducts() {
         return undefined;
       };
 
-      p.id = getNormalized(['id', 'ID', 'Id']) ?? idx;
-      p.nombre = getNormalized(['nombre', 'Nombre', 'NAME', 'name', 'producto', 'Producto']) ?? '';
-      p.categoria = getNormalized(['categoria', 'Categoria', 'CATEGORIA']) ?? '';
-      p.precio = getNormalized(['precio', 'Precio', 'price']) ?? 0;
-      const activoRaw = getNormalized(['activo', 'Activo']);
-      p.activo = activoRaw === true || String(activoRaw).toUpperCase() === 'TRUE' || activoRaw === 1 || String(activoRaw) === '1';
-      p.imagen = getNormalized(['imagen', 'Imagen', 'image']) || '';
-      p.descripcion = getNormalized(['descripcion', 'Descripcion', 'Descripción', 'descripcion']) || '';
-      p.config = getNormalized(['config', 'Config']) || '';
+      p.id = getNormalized(["id", "ID", "Id"]) ?? idx;
+      p.nombre =
+        getNormalized([
+          "nombre",
+          "Nombre",
+          "NAME",
+          "name",
+          "producto",
+          "Producto",
+        ]) ?? "";
+      p.categoria =
+        getNormalized(["categoria", "Categoria", "CATEGORIA"]) ?? "";
+      p.precio = getNormalized(["precio", "Precio", "price"]) ?? 0;
+      const activoRaw = getNormalized(["activo", "Activo"]);
+      p.activo =
+        activoRaw === true ||
+        String(activoRaw).toUpperCase() === "TRUE" ||
+        activoRaw === 1 ||
+        String(activoRaw) === "1";
+      p.imagen = getNormalized(["imagen", "Imagen", "image"]) || "";
+      p.descripcion =
+        getNormalized([
+          "descripcion",
+          "Descripcion",
+          "Descripción",
+          "descripcion",
+        ]) || "";
+      p.config = getNormalized(["config", "Config"]) || "";
       return p;
     });
     // Si no hay productos, mostrar pista útil para depuración
     if (!products || products.length === 0) {
-      console.warn('No se cargaron productos. Respuesta cruda (primeros 1000 chars):', rawText.slice(0, 1000));
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'No se encontraron productos en la respuesta. Revisa la consola (raw response) o asegúrate de que la hoja "Productos" exista y tenga datos.';
+      console.warn(
+        "No se cargaron productos. Respuesta cruda (primeros 1000 chars):",
+        rawText.slice(0, 1000)
+      );
+      errorEl.style.display = "block";
+      errorEl.textContent =
+        'No se encontraron productos en la respuesta. Revisa la consola (raw response) o asegúrate de que la hoja "Productos" exista y tenga datos.';
     }
     showLoading(false);
     renderProducts();
@@ -137,6 +176,15 @@ async function loadProducts() {
   }
 }
 
+/**
+ * tryParsePossibleJSONP
+ * ----------------------
+ * Intenta parsear texto que puede ser JSON o JSONP.
+ * Si detecta JSONP del tipo callback(...), extrae el payload y lo parsea.
+ * Devuelve un array/objeto parseado o un array vacío en caso de fallar.
+ * @param {string} txt - Texto crudo de la respuesta HTTP
+ * @returns {any} Objeto/array parseado o []
+ */
 function tryParsePossibleJSONP(txt) {
   // Si txt es JSONP del tipo callback({...}) o callback([...]) extraer el contenido
   try {
@@ -147,24 +195,30 @@ function tryParsePossibleJSONP(txt) {
     // Si no es JSONP, intentar JSON.parse directo
     return JSON.parse(txt);
   } catch (e) {
-    console.warn('No se pudo parsear respuesta como JSON/JSONP', e);
+    console.warn("No se pudo parsear respuesta como JSON/JSONP", e);
     return [];
   }
 }
 
 // Render products by sections
+/**
+ * renderProducts
+ * --------------
+ * Recorre las categorías definidas y renderiza las tarjetas de producto
+ * correspondientes dentro del grid de cada categoría. Si no hay productos
+ * para una sección, muestra un mensaje de 'No hay productos'.
+ */
 function renderProducts() {
-const categories = [
-  "almuerzos",
-  "perros",
-  "hamburguesas",
-  "salchipapas",
-  "picadas",
-  "pizzas",
-  "bebidas",
-  "acompanantes"
-];
-
+  const categories = [
+    "almuerzos",
+    "perros",
+    "hamburguesas",
+    "salchipapas",
+    "picadas",
+    "pizzas",
+    "bebidas",
+    "acompanantes",
+  ];
 
   categories.forEach((category) => {
     const grid = document.getElementById(`${category}-grid`);
@@ -172,7 +226,7 @@ const categories = [
 
     const filteredProducts = products.filter((product) => {
       try {
-        const cat = (product.categoria || '').toString().toLowerCase();
+        const cat = (product.categoria || "").toString().toLowerCase();
         return cat === category;
       } catch (e) {
         return false;
@@ -198,6 +252,15 @@ const categories = [
 }
 
 // Create product card element
+/**
+ * createProductCard
+ * -----------------
+ * Crea y devuelve un elemento DOM `.product-card` para el objeto `product`.
+ * Incluye imagen, nombre, descripción, precio y el botón de añadir.
+ * El click en la tarjeta abre el modal si el producto está activo.
+ * @param {Object} product - Objeto con propiedades del producto
+ * @returns {HTMLElement} Nodo DOM de la tarjeta del producto
+ */
 function createProductCard(product) {
   const card = document.createElement("div");
   card.className = `product-card ${!product.activo ? "inactive" : ""}`;
@@ -250,10 +313,8 @@ function createProductCard(product) {
     }
     // Siempre permitimos abrir el modal si el producto está activo
 
-updateAddToCartButton(); // 🔥 actualiza el texto del botón con precio inicial
-productModalEl.classList.add("show");
-
-
+    updateAddToCartButton(); // 🔥 actualiza el texto del botón con precio inicial
+    productModalEl.classList.add("show");
 
     // ✅ Si la tienda está abierta y el producto activo → abre el modal
     openProductModal(product);
@@ -263,6 +324,13 @@ productModalEl.classList.add("show");
 }
 
 // ✅ Get emoji based on category
+/**
+ * getCategoryEmoji
+ * ----------------
+ * Devuelve un emoji representativo según la categoría.
+ * @param {string} categoria
+ * @returns {string} emoji
+ */
 function getCategoryEmoji(categoria) {
   const emojis = {
     recomendados: "⭐",
@@ -278,8 +346,14 @@ function getCategoryEmoji(categoria) {
   return emojis[categoria.toLowerCase()] || "🍽️";
 }
 
-
 // Format price in Colombian pesos
+/**
+ * formatPrice
+ * -----------
+ * Formatea un número a formato de moneda (COP) sin decimales.
+ * @param {number|string} price
+ * @returns {string}
+ */
 function formatPrice(price) {
   const numPrice = parseFloat(price);
   return (
@@ -292,6 +366,13 @@ function formatPrice(price) {
 }
 
 // Product Modal Functions
+/**
+ * openProductModal
+ * ----------------
+ * Rellena y muestra el modal de producto con los datos del `product`.
+ * También inserta opciones extra para productos con `config` (pizzas/almuerzos).
+ * @param {Object} product
+ */
 function openProductModal(product) {
   // Modal abierto sin restricciones de horario (la disponibilidad por producto sigue)
 
@@ -324,7 +405,7 @@ function openProductModal(product) {
     description;
 
   // Update modal image
-  const modalImage = document.getElementById("modal-product-image");
+const modalImage = document.getElementById("modal-image-content");
   if (product.imagen) {
     modalImage.innerHTML = `<img src="${product.imagen}" alt="${
       product.nombre
@@ -340,97 +421,46 @@ function openProductModal(product) {
   document.getElementById("modal-quantity").textContent = modalQuantity;
   updateQuantityButtons();
 
+  // 🔥 --- BLOQUE DE CONFIGURACIÓN: delegar a ProductosVariable ---
+  try {
+    // Limpiar opciones previas si el helper está disponible
+    if (window.ProductosVariable && typeof window.ProductosVariable.removeProductConfigOptions === 'function') {
+      window.ProductosVariable.removeProductConfigOptions();
+    } else {
+      // fallback: eliminar nodo extra-options si existe
+      const existing = document.getElementById('extra-options');
+      if (existing) existing.remove();
+    }
 
-
-
-  
-
-// 🔥 --- BLOQUE CORREGIDO: configuración especial para pizzas o almuerzos ---
-const existingExtraOptions = document.getElementById("extra-options");
-if (existingExtraOptions) existingExtraOptions.remove(); // limpiar si ya existe
-
-// Seleccionamos el cuerpo principal del modal
-const modalContainer = document.querySelector("#product-modal .product-modal-content");
-
-// Buscamos la sección de instrucciones ya existente
-const instructionsSection = document.querySelector(".instructions-section");
-
-// Si el producto tiene configuración personalizada
-if (product.config) {
-  const configType = product.config.toLowerCase().trim();
-  const customOptions = document.createElement("div");
-  customOptions.id = "extra-options";
-  customOptions.style.marginTop = "10px";
-
-  if (configType === "manualpizza") {
-    customOptions.innerHTML = `
-      <h4 style="margin-bottom: 8px;">🍕 Personaliza tu pizza</h4>
-
-      <label style="font-weight: bold;">Tamaño:</label>
-      <div id="pizza-size" style="margin-bottom: 10px;">
-          <label><input type="checkbox" value="Personal"> Personal</label><br>
-          <label><input type="checkbox" value="Mediana"> Mediana</label><br>
-          <label><input type="checkbox" value="Grande"> Grande</label><br>
-      </div>
-
-      <label style="font-weight: bold;">Ingredientes:</label>
-      <div id="pizza-ingredients" style="margin-bottom: 10px;">
-          <label><input type="checkbox" value="Peperoni"> Peperoni</label><br>
-          <label><input type="checkbox" value="Extra queso"> Extra queso</label><br>
-          <label><input type="checkbox" value="Champiñones"> Champiñones</label><br>
-          <label><input type="checkbox" value="Tocineta"> Tocineta</label><br>
-      </div>
-    `;
+    // Si el producto tiene configuración, pedir al helper que la renderice
+    if (product.config && window.ProductosVariable && typeof window.ProductosVariable.renderProductConfigOptions === 'function') {
+      window.ProductosVariable.renderProductConfigOptions(product.config);
+    }
+  } catch (e) {
+    console.warn('Error al renderizar opciones de producto variables:', e);
   }
+  // 🔥 --- FIN DEL BLOQUE DE CONFIGURACIÓN ---
 
-  else if (configType === "manualalmuerzo") {
-    customOptions.innerHTML = `
-      <h4 style="margin-bottom: 8px;">🍽️ Personaliza tu almuerzo</h4>
-
-      <label style="font-weight: bold;">Proteína:</label>
-      <div id="almuerzo-proteina" style="margin-bottom: 10px;">
-          <label><input type="checkbox" value="Pollo asado"> Pollo asado</label><br>
-          <label><input type="checkbox" value="Carne de res"> Carne de res</label><br>
-          <label><input type="checkbox" value="Cerdo"> Cerdo</label><br>
-          <label><input type="checkbox" value="Pescado"> Pescado</label><br>
-      </div>
-
-      <label style="font-weight: bold;">Acompañamiento:</label>
-      <div id="almuerzo-acompanamiento" style="margin-bottom: 10px;">
-          <label><input type="checkbox" value="Arroz blanco"> Arroz blanco</label><br>
-          <label><input type="checkbox" value="Arroz con coco"> Arroz con coco</label><br>
-          <label><input type="checkbox" value="Puré de papa"> Puré de papa</label><br>
-          <label><input type="checkbox" value="Patacones"> Patacones</label><br>
-      </div>
-
-      <label style="font-weight: bold;">Bebida:</label>
-      <div id="almuerzo-bebida" style="margin-bottom: 10px;">
-          <label><input type="checkbox" value="Jugo natural"> Jugo natural</label><br>
-          <label><input type="checkbox" value="Gaseosa"> Gaseosa</label><br>
-          <label><input type="checkbox" value="Agua"> Agua</label><br>
-      </div>
-    `;
-  }
-
-  // ✅ Insertar las opciones personalizables justo ANTES de la sección de instrucciones
-  if (instructionsSection && modalContainer) {
-    modalContainer.insertBefore(customOptions, instructionsSection);
-  }
-}
-// 🔥 --- FIN DEL BLOQUE NUEVO ---
-
-
-
-// Show modal
-productModalEl.classList.add("show");
+  // Show modal
+  productModalEl.classList.add("show");
 }
 
+/**
+ * closeProductModal
+ * -----------------
+ * Cierra el modal de producto y resetea el estado local relacionado.
+ */
 function closeProductModal() {
   productModalEl.classList.remove("show");
   currentProduct = null;
   modalQuantity = 1;
 }
 
+/**
+ * increaseQuantity
+ * ----------------
+ * Incrementa la cantidad seleccionada en el modal y actualiza UI.
+ */
 function increaseQuantity() {
   modalQuantity++;
   document.getElementById("modal-quantity").textContent = modalQuantity;
@@ -438,6 +468,11 @@ function increaseQuantity() {
   updateAddToCartButton(); // 🔥 actualiza el precio del botón
 }
 
+/**
+ * decreaseQuantity
+ * ----------------
+ * Decrementa la cantidad (mínimo 1) y actualiza la UI del modal.
+ */
 function decreaseQuantity() {
   if (modalQuantity > 1) {
     modalQuantity--;
@@ -447,90 +482,70 @@ function decreaseQuantity() {
   }
 }
 
-
+/**
+ * updateQuantityButtons
+ * ---------------------
+ * Habilita/deshabilita el botón de decrementar cantidad según el valor actual.
+ */
 function updateQuantityButtons() {
   const decreaseBtn = document.getElementById("decrease-btn");
   decreaseBtn.disabled = modalQuantity <= 1;
 }
 
+/**
+ * updateAddToCartButton
+ * ---------------------
+ * Actualiza el texto del botón 'Agregar' dentro del modal para mostrar el precio total
+ * en función de la cantidad seleccionada.
+ */
 function updateAddToCartButton() {
   if (!currentProduct) return;
   const total = parseFloat(currentProduct.precio) * modalQuantity;
   const button = document.getElementById("add-to-cart-modal");
-  button.innerHTML = `Agregar <span id="modal-product-price">${formatPrice(total)}</span>`;
+  button.innerHTML = `Agregar ${formatPrice(total)}`;
 }
 
 
-
+/**
+ * addToCartFromModal
+ * ------------------
+ * Toma los datos seleccionados en el modal (cantidad, instrucciones extras)
+ * y añade el ítem al carrito. Si ya existe un ítem sin instrucciones, aumenta
+ * su cantidad. Si tiene instrucciones diferentes, crea una línea nueva.
+ */
 function addToCartFromModal() {
   if (!currentProduct) return;
 
-  // --- CAPTURAR OPCIONES DE PIZZA Y ALMUERZO ---
+  // --- CAPTURAR OPCIONES DE CONFIGURACIÓN ---
   let extraInstructions = "";
-
-  if (currentProduct.config) {
-    const configType = currentProduct.config.toLowerCase().trim();
-
-    if (configType === "manualpizza") {
-      const sizes = Array.from(
-        document.querySelectorAll('#pizza-size input[type="checkbox"]:checked')
-      ).map((i) => i.value);
-      const ingredients = Array.from(
-        document.querySelectorAll(
-          '#pizza-ingredients input[type="checkbox"]:checked'
-        )
-      ).map((i) => i.value);
-      const notes = document.getElementById("pizza-extra")?.value.trim();
-
-      if (sizes.length > 0) extraInstructions += `Tamaño: ${sizes.join(", ")}`;
-      if (ingredients.length > 0)
-        extraInstructions += `${
-          extraInstructions ? " | " : ""
-        }Ingredientes: ${ingredients.join(", ")}`;
-      if (notes)
-        extraInstructions += `${extraInstructions ? " | " : ""}Notas: ${notes}`;
+  try {
+    if (window.ProductosVariable && typeof window.ProductosVariable.collectProductConfigInstructions === 'function') {
+      extraInstructions = window.ProductosVariable.collectProductConfigInstructions();
+    } else {
+      // Fallback: leer manualmente campos conocidos si el helper no está presente
+      const pizzaSize = Array.from(document.querySelectorAll('#pizza-size input[type="checkbox"]:checked')).map(i => i.value);
+      const pizzaIngredients = Array.from(document.querySelectorAll('#pizza-ingredients input[type="checkbox"]:checked')).map(i => i.value);
+      const pizzaNotes = document.getElementById('pizza-extra')?.value?.trim();
+      const proteinas = Array.from(document.querySelectorAll('#almuerzo-proteina input[type="checkbox"]:checked')).map(i => i.value);
+      const acomp = Array.from(document.querySelectorAll('#almuerzo-acompanamiento input[type="checkbox"]:checked')).map(i => i.value);
+      const bebidas = Array.from(document.querySelectorAll('#almuerzo-bebida input[type="checkbox"]:checked')).map(i => i.value);
+      const almExtra = document.getElementById('almuerzo-extra')?.value?.trim();
+      const parts = [];
+      if (pizzaSize.length) parts.push(`Tamaño: ${pizzaSize.join(', ')}`);
+      if (pizzaIngredients.length) parts.push(`Ingredientes: ${pizzaIngredients.join(', ')}`);
+      if (pizzaNotes) parts.push(`Notas: ${pizzaNotes}`);
+      if (proteinas.length) parts.push(`Proteína: ${proteinas.join(', ')}`);
+      if (acomp.length) parts.push(`Acompañamiento: ${acomp.join(', ')}`);
+      if (bebidas.length) parts.push(`Bebida: ${bebidas.join(', ')}`);
+      if (almExtra) parts.push(`Notas: ${almExtra}`);
+      extraInstructions = parts.join(' | ');
     }
-
-    if (configType === "manualalmuerzo") {
-      const proteinas = Array.from(
-        document.querySelectorAll(
-          '#almuerzo-proteina input[type="checkbox"]:checked'
-        )
-      ).map((i) => i.value);
-      const acomp = Array.from(
-        document.querySelectorAll(
-          '#almuerzo-acompanamiento input[type="checkbox"]:checked'
-        )
-      ).map((i) => i.value);
-      const bebidas = Array.from(
-        document.querySelectorAll(
-          '#almuerzo-bebida input[type="checkbox"]:checked'
-        )
-      ).map((i) => i.value);
-      const extra = document.getElementById("almuerzo-extra")?.value.trim();
-
-      if (proteinas.length > 0)
-        extraInstructions += `Proteína: ${proteinas.join(", ")}`;
-      if (acomp.length > 0)
-        extraInstructions += `${
-          extraInstructions ? " | " : ""
-        }Acompañamiento: ${acomp.join(", ")}`;
-      if (bebidas.length > 0)
-        extraInstructions += `${
-          extraInstructions ? " | " : ""
-        }Bebida: ${bebidas.join(", ")}`;
-      if (extra)
-        extraInstructions += `${extraInstructions ? " | " : ""}Notas: ${extra}`;
-    }
+  } catch (e) {
+    console.warn('Error al recoger opciones variables:', e);
+    extraInstructions = '';
   }
-  // --- FIN CAPTURA ---
 
-  const instructions = [
-    document.getElementById("product-instructions").value.trim(),
-    extraInstructions,
-  ]
-    .filter(Boolean)
-    .join(" | ");
+  const instructions = [document.getElementById("product-instructions").value.trim(), extraInstructions].filter(Boolean).join(" | ");
 
   // Create unique ID for items with instructions
   const itemId = instructions
@@ -573,37 +588,96 @@ function addToCartFromModal() {
 }
 
 // Cart functions
+/**
+ * addToCart
+ * ---------
+ * Añade 1 unidad del producto identificado por `productId` al carrito.
+ * Se utiliza para los controles rápidos (+) en la lista del carrito.
+ * @param {string} productId
+ */
 function addToCart(productId) {
-  // This function is now used only for quantity adjustments in cart
+  // Try to find the cart line by exact id (cart item id)
+  const asStr = String(productId);
+
+  const cartItem = cart.find((it) => String(it.id) === asStr);
+  if (cartItem) {
+    // If the cart line exists, increment its quantity
+    cartItem.quantity = (cartItem.quantity || 0) + 1;
+    updateCartDisplay();
+    renderCartItems();
+    return;
+  }
+
+  // If not found in cart, try to find the product in the products list
+  // productId may be a suffixed id like '123_1600000000', so compare by original part too
+  const originalId = asStr.split("_")[0];
   const product = products.find(
-    (p) => p.id === productId || p.id === productId.split("_")[0]
+    (p) => String(p.id) === asStr || String(p.id) === originalId
   );
   if (!product || !product.activo) return;
 
-  const existingItem = cart.find(
-    (item) => item.id === productId || item.originalId === productId
-  );
-
-  if (existingItem) {
-    existingItem.quantity += 1;
-    updateCartDisplay();
-    renderCartItems();
-  }
+  // Add as a new cart line
+  cart.push({
+    id: String(product.id),
+    originalId: product.id,
+    name: product.nombre,
+    price: parseFloat(product.precio),
+    quantity: 1,
+    instructions: "",
+  });
+  updateCartDisplay();
+  renderCartItems();
 }
 
+/**
+ * removeFromCart
+ * --------------
+ * Resta una unidad del ítem del carrito. Si la cantidad llega a 0 elimina
+ * la línea del carrito.
+ * @param {string} productId
+ */
 function removeFromCart(productId) {
-  const itemIndex = cart.findIndex((item) => item.id === productId);
-  if (itemIndex > -1) {
-    if (cart[itemIndex].quantity > 1) {
-      cart[itemIndex].quantity -= 1;
-    } else {
-      cart.splice(itemIndex, 1);
-    }
-    updateCartDisplay();
-    renderCartItems();
+  const asStr = String(productId);
+  console.debug("removeFromCart called with:", asStr, "current cart:", cart);
+
+  // 1) Try exact match against cart item id
+  let itemIndex = cart.findIndex((item) => String(item.id) === asStr);
+
+  // 2) If not found, try match against originalId
+  if (itemIndex === -1) {
+    itemIndex = cart.findIndex((item) => String(item.originalId) === asStr);
   }
+
+  // 3) If still not found, try matching using the prefix before '_' (for suffixed ids)
+  if (itemIndex === -1) {
+    const prefix = asStr.split("_")[0];
+    itemIndex = cart.findIndex((item) => String(item.originalId) === prefix || String(item.id).split("_")[0] === prefix);
+  }
+
+  if (itemIndex === -1) {
+    console.warn("removeFromCart: item not found for id", asStr);
+    return;
+  }
+
+  if (cart[itemIndex].quantity > 1) {
+    cart[itemIndex].quantity -= 1;
+  } else {
+    // remove item entirely when quantity reaches 0
+    cart.splice(itemIndex, 1);
+  }
+
+  // Siempre actualizar la UI
+  updateCartDisplay();
+  renderCartItems();
 }
 
+// carrito flotante y modal
+/**
+ * updateCartDisplay
+ * -----------------
+ * Actualiza la UI del carrito flotante: recuenta items, calcula el total
+ * y ajusta la visibilidad/estado del botón flotante.
+ */
 function updateCartDisplay() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce(
@@ -619,22 +693,34 @@ function updateCartDisplay() {
     "cart-total-modal"
   ).textContent = `Total: ${formatPrice(totalPrice)}`;
 
-  if (totalItems > 0) {
-    cartFloatEl.classList.add("show");
-  } else {
-    cartFloatEl.classList.remove("show");
-  }
+if (totalItems > 0) { cartFloatEl.classList.add("show"); } else { cartFloatEl.classList.remove("show"); }
 }
 
+/**
+ * openCart
+ * --------
+ * Muestra el modal del carrito y renderiza los items actuales.
+ */
 function openCart() {
   cartModalEl.classList.add("show");
   renderCartItems();
 }
 
+/**
+ * closeCart
+ * ---------
+ * Cierra el modal del carrito.
+ */
 function closeCart() {
   cartModalEl.classList.remove("show");
 }
 
+/**
+ * renderCartItems
+ * ----------------
+ * Renderiza las líneas del carrito dentro del modal del carrito. Si el
+ * carrito está vacío, muestra mensaje correspondiente.
+ */
 function renderCartItems() {
   const cartItemsEl = document.getElementById("cart-items");
 
@@ -671,16 +757,33 @@ function renderCartItems() {
             </div>
           </div>
           <div class="item-controls">
-            <button class="quantity-btn" onclick="removeFromCart('${item.id}')">-</button>
+            <button class="quantity-btn decrease-btn" data-id="${item.id}">-</button>
             <span class="quantity">${item.quantity}</span>
-            <button class="quantity-btn" onclick="addToCart('${item.id}')">+</button>
+            <button class="quantity-btn increase-btn" data-id="${item.id}">+</button>
           </div>
         </div>
       `;
     })
     .join("");
+
+  // Delegated click handler for increase/decrease buttons
+  cartItemsEl.onclick = function (e) {
+    const btn = e.target.closest('.quantity-btn');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    if (btn.classList.contains('decrease-btn')) {
+      removeFromCart(id);
+    } else if (btn.classList.contains('increase-btn')) {
+      addToCart(id);
+    }
+  };
 }
 
+/**
+ * clearCart
+ * ---------
+ * Vacía el carrito después de una confirmación del usuario.
+ */
 function clearCart() {
   if (confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
     cart = [];
@@ -689,6 +792,12 @@ function clearCart() {
   }
 }
 
+/**
+ * checkout
+ * --------
+ * Simula el envío del pedido: muestra un resumen y limpia el carrito.
+ * Aquí podría integrarse el envío real (API, WhatsApp, etc.).
+ */
 function checkout() {
   if (cart.length === 0) {
     alert("Tu carrito está vacío");
@@ -723,28 +832,6 @@ function checkout() {
   closeCart();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ==================================================
 // ✅ SCROLL CATEGORÍAS MEJORADO Y COMPATIBLE
 // ==================================================
@@ -752,6 +839,14 @@ function checkout() {
 let manualScroll = false;
 let scrollTimeout = null;
 
+/**
+ * scrollToSection
+ * ---------------
+ * Hace scroll suave hacia una sección de la página y marca el botón
+ * de categoría correspondiente como activo. Evita que el listener de
+ * scroll automático cambie el estado durante la navegación manual.
+ * @param {string} sectionId
+ */
 function scrollToSection(sectionId) {
   const section = document.getElementById(sectionId);
   const buttons = document.querySelectorAll(".category-btn");
@@ -761,22 +856,22 @@ function scrollToSection(sectionId) {
   clearTimeout(scrollTimeout);
 
   // Actualizar el botón activo
-  buttons.forEach(btn => btn.classList.remove("active"));
-  const clickedButton = Array.from(buttons).find(btn =>
+  buttons.forEach((btn) => btn.classList.remove("active"));
+  const clickedButton = Array.from(buttons).find((btn) =>
     btn.getAttribute("onclick")?.includes(sectionId)
   );
   if (clickedButton) clickedButton.classList.add("active");
 
-// 🟩 Hacer scroll a la sección (dejando espacio por el header fijo)
-if (sectionId === "todos") {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-} else if (section) {
-  const headerOffset = 210; // ajusta si tu header es más alto o más bajo
-  const elementPosition = section.getBoundingClientRect().top + window.pageYOffset;
-  const offsetPosition = elementPosition - headerOffset;
-  window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-}
-
+  // 🟩 Hacer scroll a la sección (dejando espacio por el header fijo)
+  if (sectionId === "todos") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (section) {
+    const headerOffset = 210; // ajusta si tu header es más alto o más bajo
+    const elementPosition =
+      section.getBoundingClientRect().top + window.pageYOffset;
+    const offsetPosition = elementPosition - headerOffset;
+    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+  }
 
   // Después de 800ms, vuelve a modo automático
   scrollTimeout = setTimeout(() => (manualScroll = false), 800);
@@ -785,6 +880,12 @@ if (sectionId === "todos") {
 // ==================================================
 // 🔹 ACTUALIZAR BOTÓN ACTIVO EN SCROLL
 // ==================================================
+/**
+ * listener de scroll
+ * ------------------
+ * Actualiza el botón de categoría activo basado en la sección visible.
+ * También centra el botón activo en su contenedor si es necesario.
+ */
 window.addEventListener("scroll", () => {
   if (manualScroll) return; // no hacer nada si el scroll fue manual
 
@@ -794,14 +895,14 @@ window.addEventListener("scroll", () => {
   const scrollY = window.scrollY;
 
   // Detectar la sección visible
-  sections.forEach(section => {
+  sections.forEach((section) => {
     const sectionTop = section.offsetTop - 330;
     if (scrollY >= sectionTop) current = section.getAttribute("id");
   });
 
   // Actualizar el botón activo
-  buttons.forEach(btn => btn.classList.remove("active"));
-  const activeBtn = Array.from(buttons).find(btn =>
+  buttons.forEach((btn) => btn.classList.remove("active"));
+  const activeBtn = Array.from(buttons).find((btn) =>
     btn.getAttribute("onclick")?.includes(current)
   );
   if (activeBtn) {
@@ -812,9 +913,15 @@ window.addEventListener("scroll", () => {
     if (categories) {
       const btnRect = activeBtn.getBoundingClientRect();
       const containerRect = categories.getBoundingClientRect();
-      if (btnRect.left < containerRect.left || btnRect.right > containerRect.right) {
+      if (
+        btnRect.left < containerRect.left ||
+        btnRect.right > containerRect.right
+      ) {
         categories.scrollTo({
-          left: activeBtn.offsetLeft - containerRect.width / 2 + activeBtn.offsetWidth / 2,
+          left:
+            activeBtn.offsetLeft -
+            containerRect.width / 2 +
+            activeBtn.offsetWidth / 2,
           behavior: "smooth",
         });
       }
@@ -825,15 +932,33 @@ window.addEventListener("scroll", () => {
 // ==================================================
 // 🔹 UTILIDADES DE ESTADO (loading / error)
 // ==================================================
+/**
+ * showLoading
+ * -----------
+ * Muestra/oculta la interfaz de carga (skeleton) y la sección de menú.
+ * @param {boolean} show
+ */
 function showLoading(show) {
   skeletonLoadingEl.style.display = show ? "grid" : "none";
-  document.querySelector(".menu-sections").style.display = show ? "none" : "block";
+  document.querySelector(".menu-sections").style.display = show
+    ? "none"
+    : "block";
 }
 
+/**
+ * showError
+ * ---------
+ * Muestra el elemento de error en la UI.
+ */
 function showError() {
   errorEl.style.display = "block";
 }
 
+/**
+ * hideError
+ * ---------
+ * Oculta el elemento de error en la UI.
+ */
 function hideError() {
   errorEl.style.display = "none";
 }
@@ -841,12 +966,10 @@ function hideError() {
 // ==================================================
 // 🔹 CIERRE DE MODALES AL HACER CLICK FUERA
 // ==================================================
-cartModalEl.addEventListener("click", e => {
+cartModalEl.addEventListener("click", (e) => {
   if (e.target === cartModalEl) closeCart();
 });
 
-productModalEl.addEventListener("click", e => {
+productModalEl.addEventListener("click", (e) => {
   if (e.target === productModalEl) closeProductModal();
 });
-
-
