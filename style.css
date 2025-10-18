@@ -682,8 +682,6 @@ body::before {
     align-items: center;
     justify-content: center;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    width: 70px;
-    height: 70px;
 }
 
 
@@ -768,6 +766,7 @@ body::before {
     align-items: center;
     justify-content: center;
     z-index: 2500;
+    overflow-y: auto;
 }
 
 .product-modal.show {
@@ -776,38 +775,44 @@ body::before {
 
 .product-modal-content {
     background: var(--card-bg);
-    border-radius: 20px;
-    padding: 30px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 80%;
+    width: 100%;
+    height: 100%;
     overflow-y: auto;
 }
 
 .product-modal-header {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
+    padding: 0px 30px;
 }
 
 .product-modal-title {
-    font-size: 1.5rem;
+    font-size: 25px;
     font-weight: 700;
     color: var(--text-color);
 }
 
 .close-product-modal {
-    background: none;
-    border: none;
-    font-size: 2.5rem;
-    cursor: pointer;
-    color: #718096;
+  position: absolute;
+  top: 15px;       /* separación desde arriba */
+  right: 15px;     /* separación desde la derecha */
+  background: none;
+  color: white;
+  border: none;
+  font-size: 40px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
 }
 
 .product-modal-image {
     width: 100%;
-    height: 200px;
-    border-radius: 15px;
+    height: 330px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -820,25 +825,18 @@ body::before {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 15px;
+    border-radius: 0 0 60px 60px; /* solo inferior derecha e izquierda */
 }
+
 
 /* Precio sobre la imagen (modal) - estilo premium */
 /* Precio sobre la imagen (modal) - esquina superior derecha */
 .modal-price-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--accent);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 12px;
+    background: none;
+    color: var(--accent);
     font-weight: 700;
     font-size: 0.9rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     z-index: 0;
-    backdrop-filter: blur(4px);
-    letter-spacing: 0.3px;
     transition: all 0.25s ease-in-out;
 }
 
@@ -847,7 +845,6 @@ body::before {
 .modal-image-container {
     position: relative;
     overflow: hidden;
-    border-radius: 16px;
 }
 
 /* Responsive */
@@ -856,18 +853,17 @@ body::before {
         top: 8px;
         right: 8px;
         font-size: 0.85rem;
-        padding: 5px 12px;
     }
 }
 
 
 
 .product-modal-description {
+    padding: 0px 30px;
+    margin: 10px 0px;
     font-size: 1rem;
     color: var(--muted);
     line-height: 1.5;
-    margin-bottom: 10px;
-    font-style: italic;
 }
 
 
@@ -875,6 +871,7 @@ body::before {
    OPCIONES PERSONALIZABLES
 ================================ */
 #extra-options {
+    padding: 0 30px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -915,10 +912,11 @@ body::before {
    📝 INSTRUCCIONES ESPECIALES
 ================================ */
 .instructions-section {
-    margin-bottom: 25px;
+    margin-bottom: 120px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    padding: 0 30px;
 }
 
 /* Etiqueta del textarea */
@@ -963,11 +961,18 @@ body::before {
 }
 
 .modal-actions {
+    position: absolute; /* Fijo dentro del modal */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    z-index: 100;
 }
 
 
@@ -985,8 +990,8 @@ body::before {
     background: #e4e4e4;
     border: NONE;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1042,8 +1047,8 @@ body::before {
 
 /* Precio dinámico en el botón */
 #modal-product-price {
-    margin-left: 10px;
-    font-size: 1.1rem;
+    font-size: 22px;
+    color: var(--primary-1);
 }
 
 .add-to-cart-modal-btn {
@@ -1211,6 +1216,31 @@ body::before {
     color: #a0aec0;
 }
 
+/* === Ícono de eliminar producto === */
+.cart-item-delete {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  filter: brightness(0) saturate(100%) invert(24%) sepia(8%) saturate(800%) hue-rotate(178deg) brightness(92%) contrast(91%);
+}
+
+.cart-item-delete:hover {
+  transform: scale(1.15);
+  opacity: 0.8;
+  filter: brightness(0) saturate(100%) invert(24%) sepia(90%) saturate(6182%) hue-rotate(350deg) brightness(92%) contrast(85%);
+}
+
+/* === Animación al eliminar producto === */
+.fade-out {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+
+
 /* --- Información del producto --- */
 .item-info {
     display: flex;
@@ -1271,7 +1301,7 @@ body::before {
 
 /* === Observaciones generales === */
 .cart-observations {
-    margin: 15px 0 25px;
+    margin: 15px 0 0px;
     display: flex;
     flex-direction: column;
 }
@@ -1326,7 +1356,7 @@ body::before {
 
 /* 💳 Select de método de pago */
 .cart-payment-select {
-    width: 50%;
+    width: 35%;
     padding: 10px 12px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 10px;
@@ -1347,6 +1377,17 @@ body::before {
 .cart-payment-select option {
     background: var(--card-bg);
     color: var(--text-color);
+}
+
+/* 🔴 Animación de error para el select método de pago */
+.shake-error {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
 

@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Domicilio | Mr. George</title>
+    <link rel="icon" type="image/png" href="img/icono_tienda.png">
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -19,7 +20,7 @@
 
         body {
             margin: 0;
-            font-family: "Poppins", sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
             overflow: hidden;
         }
@@ -44,13 +45,34 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
             padding: 20px;
             background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0) 100%);
             color: white;
         }
 
-        /* 🧹 Inputs con botón limpiador integrado */
+        /* 🔙 Botón de ir atrás (dentro del overlay) */
+        .btn-back {
+            align-self: flex-start;
+            background: none;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+
+        .btn-back img {
+            width: 14px;
+            height: auto;
+        }
+
+        /* 🧹 Inputs */
         .input-container {
             position: relative;
             width: 90%;
@@ -65,7 +87,6 @@
             outline: none;
             font-size: 15px;
             backdrop-filter: blur(8px);
-
             background: #fff8;
             color: #333;
         }
@@ -88,34 +109,60 @@
             opacity: 1;
         }
 
-        #subtotal, #domicilio-cost {
+        #subtotal,
+        #domicilio-cost {
             font-weight: bold;
         }
 
-        /* 📋 Estilo de sugerencias */
+        /* 📋 Estilo de sugerencias mejorado */
         .suggestions {
             position: absolute;
-            top: 60px;
-            width: 80%;
+            top: 106px;
+            width: 85%;
             max-width: 500px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
             display: none;
             z-index: 1001;
+            max-height: 50vh;
+            /* 🔹 límite de altura visible */
+            overflow-y: auto;
+            /* 🔹 scroll si hay demasiadas sugerencias */
+            padding: 6px;
+            backdrop-filter: blur(6px);
         }
 
+        /* Estilo individual de cada sugerencia */
         .suggestions div {
-            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            margin: 4px 0;
+            padding: 10px 14px;
             cursor: pointer;
             font-size: 15px;
             color: #333;
+            transition: background 0.2s, transform 0.15s;
         }
 
         .suggestions div:hover {
             background: #ff9800;
             color: white;
+            transform: scale(1.02);
+        }
+
+        /* 🔹 Scroll elegante */
+        .suggestions::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .suggestions::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .suggestions::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.45);
         }
 
         /* 📍 Botón de ubicación actual */
@@ -147,27 +194,6 @@
             pointer-events: none;
         }
 
-        .leaflet-bottom.leaflet-left {
-            display: none !important;
-            bottom: 200px !important;
-            left: 15px !important;
-        }
-
-
-
-        .leaflet-popup-content-wrapper {
-            width: 250px !important;
-            border-radius: 20px !important;
-            margin-bottom: 20px !important;
-        }
-
-
-        .leaflet-popup-tip {
-            display: none;
-        }
-
-
-
         /* 📋 Panel de totales */
         .panel {
             position: absolute;
@@ -197,6 +223,25 @@
             padding-top: 8px;
         }
 
+
+
+        #linea,
+        #recargo-nocturno {
+            color: #d84315;
+            /* Rojo-alarma */
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            display: flex;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: none;
+            /* Por defecto oculto; JS lo muestra cuando aplica */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+        }
+
+
         .btn-finalizar {
             width: 100%;
             margin-top: 10px;
@@ -222,6 +267,11 @@
 
     <!-- 🌫️ Controles flotantes -->
     <div class="overlay">
+        <!-- 🔙 Botón de ir atrás dentro del overlay -->
+        <button class="btn-back" onclick="window.location.href='index.html'"">
+      <img src=" iconos/back.png" alt="Atrás" />
+        </button>
+
         <div class="input-container">
             <input type="text" id="buscar" placeholder="🔍 Buscar dirección o barrio..." />
             <span class="clear-btn" id="clearBuscar">✖</span>
@@ -240,7 +290,6 @@
         <img src="iconos/norte.png" alt="Ubicación" />
     </button>
 
-
     <!-- 💰 Panel de totales -->
     <div class="panel">
         <div class="linea">
@@ -251,6 +300,10 @@
             <span id="domicilio-label">Costo domicilio:</span>
             <span id="domicilio-cost">Pendiente</span>
         </div>
+        <div class="linea" id="recargo-nocturno" style="color: #d84315; font-size: 14px; display: none;">
+            ⚠️ A partir de las 10:00 PM el domicilio aumenta un 40% por recargo nocturno
+        </div>
+
         <div class="linea total">
             <span>Total a pagar:</span>
             <span id="total">$0</span>
@@ -258,7 +311,7 @@
         <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar pedido</button>
     </div>
 
-    <!-- Script -->
+    <!-- Scripts -->
     <script>
         document.getElementById("clearBuscar").addEventListener("click", () => {
             document.getElementById("buscar").value = "";

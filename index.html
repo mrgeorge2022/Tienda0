@@ -205,54 +205,56 @@
 
 
 
-  <!-- Product Modal -->
-  <div class="product-modal" id="product-modal">
-    <div class="product-modal-content">
-      <div class="product-modal-header">
-        <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
-        <button class="close-product-modal" onclick="closeProductModal()">×</button>
-      </div>
+<!-- Product Modal -->
+<div class="product-modal" id="product-modal">
+  <div class="product-modal-content">
 
-      <div class="modal-image-container">
-        <!-- Precio arriba -->
-        <div class="modal-price-overlay" id="modal-product-price">$0</div>
-
-        <!-- Imagen del producto (donde JS inserta la imagen dinámica) -->
-        <div class="product-modal-image" id="modal-image-content">
-          🍽️
-        </div>
-      </div>
-
-
-
-      <div class="product-modal-description" id="modal-product-description">
-        Descripción del producto
-      </div>
-
-
-      <div class="instructions-section">
-        <label class="instructions-label" for="product-instructions">
-          Instrucciones especiales (opcional):
-        </label>
-        <textarea id="product-instructions" class="instructions-textarea"
-          placeholder="Ej: Sin cebolla, extra queso, término medio..."></textarea>
-      </div>
-
-      <div class="modal-actions">
-        <div class="quantity-section">
-          <div class="quantity-control">
-            <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
-            <span class="quantity-display" id="modal-quantity">1</span>
-            <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
-          </div>
-        </div>
-
-        <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
-          Agregar al carrito
-        </button>
+    <!-- Imagen principal con precio superpuesto -->
+    <div class="modal-image-container">
+      <button class="close-product-modal" onclick="closeProductModal()">×</button>
+      <div class="product-modal-image" id="modal-image-content">
+        🍽️
       </div>
     </div>
+
+    <!-- Nombre del producto -->
+    <div class="product-modal-header">
+      <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
+            <div class="modal-price-overlay" id="modal-product-price">$0</div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="product-modal-description" id="modal-product-description">
+      Descripción del producto
+    </div>
+
+    <!-- Instrucciones especiales -->
+    <div class="instructions-section">
+      <label class="instructions-label" for="product-instructions">
+        Instrucciones especiales (opcional):
+      </label>
+      <textarea id="product-instructions" class="instructions-textarea"
+        placeholder="Ej: Sin cebolla, extra queso, término medio..."></textarea>
+    </div>
+
+    <!-- Incrementadores y botón fijo abajo -->
+    <div class="modal-actions">
+      <div class="quantity-section">
+        <div class="quantity-control">
+          <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
+          <span class="quantity-display" id="modal-quantity">1</span>
+          <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
+        </div>
+      </div>
+
+      <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
+        Agregar al carrito
+      </button>
+    </div>
+
   </div>
+</div>
+
 
   <!-- Cart Modal -->
   <div class="cart-modal" id="cart-modal">
@@ -276,10 +278,12 @@
       <div class="cart-summary">
         <div class="payment-method">
           <select id="payment-method" class="cart-payment-select">
+            <option value="" selected disabled>💰 Selecciona método de pago</option>
             <option value="Efectivo">💵 Efectivo</option>
             <option value="Transferencia">💳 Transferencia</option>
             <option value="Efectivo/Transferencia">💰 Efectivo / Transferencia</option>
           </select>
+
           <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
         </div>
         <div class="cart-actions">
@@ -292,50 +296,51 @@
 
 
   <!-- Floating Cart -->
-<div class="cart-float" id="cart-float" onclick="openCart()">
-  <div class="cart-icon">
-    <img src="iconos/carrito.png" alt="Carrito">
+  <div class="cart-float" id="cart-float" onclick="openCart()">
+    <div class="cart-icon">
+      <img src="iconos/carrito.png" alt="Carrito">
+    </div>
+    <div class="cart-info" id="cart-info">
+      <div class="cart-count" id="cart-count">0 productos</div>
+      <div class="cart-total" id="cart-total">$0</div>
+    </div>
   </div>
-  <div class="cart-info" id="cart-info">
-    <div class="cart-count" id="cart-count">0 productos</div>
-    <div class="cart-total" id="cart-total">$0</div>
-  </div>
-</div>
 
 
 
 
 
   <!-- Modal de tipo de entrega -->
-<div class="delivery-modal" id="delivery-modal">
-  <div class="delivery-content">
-    <h3>¿Cómo quieres recibir tu pedido?</h3>
-    <div class="delivery-options">
-      <button onclick="selectDeliveryType('Domicilio')" class="delivery-option-btn">🏠 Domicilio</button>
-      <button onclick="selectDeliveryType('Recoger en tienda')" class="delivery-option-btn">🏬 Recoger en tienda</button>
-      <button onclick="selectDeliveryType('Mesa')" class="delivery-option-btn">🍽️ Mesa</button>
-    </div>
-    <button class="close-delivery" onclick="closeDeliveryModal()">Cancelar</button>
-  </div>
-</div>
-
-
-
-<!-- Modal de datos del cliente -->
-<div class="customer-modal" id="customer-modal">
-  <div class="customer-content">
-    <h3 id="customer-modal-title">Datos del pedido</h3>
-    <form id="customer-form">
-      <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
-      <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
-      <div id="mesa-field" style="display:none;">
-        <input type="text" id="customer-mesa" placeholder="🍽️ Número de mesa">
+  <div class="delivery-modal" id="delivery-modal">
+    <div class="delivery-content">
+      <h3>¿Cómo quieres recibir tu pedido?</h3>
+      <div class="delivery-options">
+        <button onclick="selectDeliveryType('Domicilio')" class="delivery-option-btn">🏠 Domicilio</button>
+        <button onclick="selectDeliveryType('Recoger en tienda')" class="delivery-option-btn">🏬 Recoger en
+          tienda</button>
+        <button onclick="selectDeliveryType('Mesa')" class="delivery-option-btn">🍽️ Mesa</button>
       </div>
-      <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
-    </form>
-    <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
+      <button class="close-delivery" onclick="closeDeliveryModal()">Cancelar</button>
+    </div>
   </div>
-</div>
+
+
+
+  <!-- Modal de datos del cliente -->
+  <div class="customer-modal" id="customer-modal">
+    <div class="customer-content">
+      <h3 id="customer-modal-title">Datos del pedido</h3>
+      <form id="customer-form">
+        <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
+        <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
+        <div id="mesa-field" style="display:none;">
+          <input type="text" id="customer-mesa" placeholder="🍽️ Número de mesa">
+        </div>
+        <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
+      </form>
+      <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
+    </div>
+  </div>
 
 
   <!-- === FOOTER INFO === -->

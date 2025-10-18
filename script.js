@@ -26,8 +26,22 @@ const productModalEl = document.getElementById("product-modal");
  * Actualmente llama a `loadProducts` para cargar los productos desde Google Sheets.
  */
 document.addEventListener("DOMContentLoaded", function () {
+  // 🛒 Cargar productos
   loadProducts();
+
+  // 💾 Restaurar carrito desde localStorage si existe
+  const savedCart = localStorage.getItem("cart");
+  if (savedCart) {
+    try {
+      cart = JSON.parse(savedCart);
+      updateCartDisplay();
+    } catch (e) {
+      console.warn("Error al restaurar carrito:", e);
+      cart = [];
+    }
+  }
 });
+
 
 // Nota: la lógica de horario fue eliminada; la tienda siempre permite interacción local
 
@@ -377,21 +391,19 @@ function formatPrice(price) {
  * @param {Object} product
  */
 function openProductModal(product) {
-  // Modal abierto sin restricciones de horario (la disponibilidad por producto sigue)
-
   if (!product.activo) {
     alert("Este producto está agotado temporalmente");
     return;
   }
 
   currentProduct = product;
+
+  // ✅ Siempre reiniciar cantidad a 1 al abrir modal nuevo
   modalQuantity = 1;
 
-  // Update modal content
+  // Actualizar contenido del modal
   document.getElementById("modal-product-name").textContent = product.nombre;
-  document.getElementById("modal-product-price").textContent = formatPrice(
-    product.precio
-  );
+  document.getElementById("modal-product-price").textContent = formatPrice(product.precio);
 
   const descripcionValue =
     product.descripcion ||
@@ -399,54 +411,45 @@ function openProductModal(product) {
     product.DESCRIPCION ||
     product.descripción;
   const description =
-    descripcionValue &&
-    descripcionValue.toString().trim() !== "" &&
-    descripcionValue !== "undefined"
+    descripcionValue && descripcionValue.toString().trim() !== "" && descripcionValue !== "undefined"
       ? descripcionValue
       : "Sin descripción disponible";
-  document.getElementById("modal-product-description").textContent =
-    description;
+  document.getElementById("modal-product-description").textContent = description;
 
-  // Update modal image
-const modalImage = document.getElementById("modal-image-content");
+  // Imagen
+  const modalImage = document.getElementById("modal-image-content");
   if (product.imagen) {
-    modalImage.innerHTML = `<img src="${product.imagen}" alt="${
-      product.nombre
-    }" onerror="this.style.display='none'; this.parentElement.innerHTML='${getCategoryEmoji(
-      product.categoria
-    )}';">`;
+    modalImage.innerHTML = `<img src="${product.imagen}" alt="${product.nombre}" onerror="this.style.display='none'; this.parentElement.innerHTML='${getCategoryEmoji(product.categoria)}';">`;
   } else {
     modalImage.innerHTML = getCategoryEmoji(product.categoria);
   }
 
-  // Reset form
+  // Reset campos
   document.getElementById("product-instructions").value = "";
   document.getElementById("modal-quantity").textContent = modalQuantity;
   updateQuantityButtons();
 
-  // 🔥 --- BLOQUE DE CONFIGURACIÓN: delegar a ProductosVariable ---
+  // 🧼 Eliminar configuraciones anteriores si existen
   try {
-    // Limpiar opciones previas si el helper está disponible
-    if (window.ProductosVariable && typeof window.ProductosVariable.removeProductConfigOptions === 'function') {
+    if (window.ProductosVariable && typeof window.ProductosVariable.removeProductConfigOptions === "function") {
       window.ProductosVariable.removeProductConfigOptions();
     } else {
-      // fallback: eliminar nodo extra-options si existe
-      const existing = document.getElementById('extra-options');
+      const existing = document.getElementById("extra-options");
       if (existing) existing.remove();
     }
 
-    // Si el producto tiene configuración, pedir al helper que la renderice
-    if (product.config && window.ProductosVariable && typeof window.ProductosVariable.renderProductConfigOptions === 'function') {
+    if (product.config && window.ProductosVariable && typeof window.ProductosVariable.renderProductConfigOptions === "function") {
       window.ProductosVariable.renderProductConfigOptions(product.config);
     }
   } catch (e) {
-    console.warn('Error al renderizar opciones de producto variables:', e);
+    console.warn("Error al renderizar opciones variables:", e);
   }
-  // 🔥 --- FIN DEL BLOQUE DE CONFIGURACIÓN ---
 
-  // Show modal
+  // ✅ Mostrar modal y actualizar botón con precio base
   productModalEl.classList.add("show");
+  updateAddToCartButton();
 }
+
 
 /**
  * closeProductModal
@@ -517,62 +520,45 @@ function updateAddToCartButton() {
  * su cantidad. Si tiene instrucciones diferentes, crea una línea nueva.
  */
 function addToCartFromModal() {
-
-  // 🚫 Bloquear si la tienda está cerrada
   if (!window.tiendaAbierta) {
     alert("⏰ Lo sentimos, la tienda está cerrada. Te invitamos a ver nuestro horario.");
     closeProductModal();
     return;
   }
-
   if (!currentProduct) return;
 
-  // --- CAPTURAR OPCIONES DE CONFIGURACIÓN ---
+  // --- Capturar opciones de configuración ---
   let extraInstructions = "";
   try {
     if (window.ProductosVariable && typeof window.ProductosVariable.collectProductConfigInstructions === 'function') {
       extraInstructions = window.ProductosVariable.collectProductConfigInstructions();
-    } else {
-      // Fallback: leer manualmente campos conocidos si el helper no está presente
-      const pizzaSize = Array.from(document.querySelectorAll('#pizza-size input[type="checkbox"]:checked')).map(i => i.value);
-      const pizzaIngredients = Array.from(document.querySelectorAll('#pizza-ingredients input[type="checkbox"]:checked')).map(i => i.value);
-      const pizzaNotes = document.getElementById('pizza-extra')?.value?.trim();
-      const proteinas = Array.from(document.querySelectorAll('#almuerzo-proteina input[type="checkbox"]:checked')).map(i => i.value);
-      const acomp = Array.from(document.querySelectorAll('#almuerzo-acompanamiento input[type="checkbox"]:checked')).map(i => i.value);
-      const bebidas = Array.from(document.querySelectorAll('#almuerzo-bebida input[type="checkbox"]:checked')).map(i => i.value);
-      const almExtra = document.getElementById('almuerzo-extra')?.value?.trim();
-      const parts = [];
-      if (pizzaSize.length) parts.push(`Tamaño: ${pizzaSize.join(', ')}`);
-      if (pizzaIngredients.length) parts.push(`Ingredientes: ${pizzaIngredients.join(', ')}`);
-      if (pizzaNotes) parts.push(`Notas: ${pizzaNotes}`);
-      if (proteinas.length) parts.push(`Proteína: ${proteinas.join(', ')}`);
-      if (acomp.length) parts.push(`Acompañamiento: ${acomp.join(', ')}`);
-      if (bebidas.length) parts.push(`Bebida: ${bebidas.join(', ')}`);
-      if (almExtra) parts.push(`Notas: ${almExtra}`);
-      extraInstructions = parts.join(' | ');
     }
   } catch (e) {
     console.warn('Error al recoger opciones variables:', e);
     extraInstructions = '';
   }
 
-  const instructions = [document.getElementById("product-instructions").value.trim(), extraInstructions].filter(Boolean).join(" | ");
+  const instructions = [
+    document.getElementById("product-instructions").value.trim(),
+    extraInstructions
+  ].filter(Boolean).join(" | ");
 
-  // Create unique ID for items with instructions
-  const itemId = instructions
-    ? `${currentProduct.id}_${Date.now()}`
-    : currentProduct.id;
+  // 🔹 Mostrar opciones en el modal antes de agregar al carrito
+  const selectedContainer = document.getElementById("modal-selected-options");
+  if (selectedContainer) {
+    selectedContainer.textContent = instructions || "Sin configuraciones adicionales";
+  }
+
+  // Crear ID único si hay instrucciones
+  const itemId = instructions ? `${currentProduct.id}_${Date.now()}` : currentProduct.id;
 
   const existingItem = cart.find(
-    (item) =>
-      item.id === currentProduct.id && item.instructions === instructions
+    (item) => item.id === currentProduct.id && item.instructions === instructions
   );
 
   if (existingItem && !instructions) {
-    // If no instructions and item exists, just increase quantity
     existingItem.quantity += modalQuantity;
   } else {
-    // Add new item or item with different instructions
     cart.push({
       id: itemId,
       originalId: currentProduct.id,
@@ -585,7 +571,7 @@ function addToCartFromModal() {
 
   updateCartDisplay();
 
-  // Show success feedback
+  // Feedback visual
   const button = document.getElementById("add-to-cart-modal");
   const originalText = button.textContent;
   button.textContent = "¡Agregado!";
@@ -597,6 +583,7 @@ function addToCartFromModal() {
     closeProductModal();
   }, 500);
 }
+
 
 // Cart functions
 /**
@@ -718,6 +705,9 @@ function updateCartDisplay() {
     cartTotalEl.textContent = "";
     cartTotalModalEl.textContent = "";
   }
+
+    // 💾 Guardar el carrito actual en localStorage
+  localStorage.setItem("cart", JSON.stringify(cart))
 }
 
 
@@ -777,8 +767,7 @@ function renderCartItems() {
   }
 
   cartItemsEl.innerHTML = cart
-    .map((item) => {
-      // Buscar el producto original para obtener la imagen
+    .map((item, index) => {
       const product = products.find(
         (p) => p.id === item.originalId || p.id === item.id
       );
@@ -789,8 +778,14 @@ function renderCartItems() {
         : `<div class="cart-item-placeholder">🍽️</div>`;
 
       return `
-        <div class="cart-item">
+        <div class="cart-item" data-index="${index}">
           <div class="item-left">
+            <img 
+              src="iconos/basura.png" 
+              alt="Eliminar" 
+              class="cart-item-delete" 
+              title="Eliminar producto"
+            >
             ${imageHTML}
             <div class="item-info">
               <div class="item-name">${item.name}</div>
@@ -812,18 +807,48 @@ function renderCartItems() {
     })
     .join("");
 
-  // Delegated click handler for increase/decrease buttons
+  // Delegated click handler
   cartItemsEl.onclick = function (e) {
-    const btn = e.target.closest('.quantity-btn');
-    if (!btn) return;
-    const id = btn.getAttribute('data-id');
-    if (btn.classList.contains('decrease-btn')) {
-      removeFromCart(id);
-    } else if (btn.classList.contains('increase-btn')) {
-      addToCart(id);
+    const deleteIcon = e.target.closest(".cart-item-delete");
+    const btn = e.target.closest(".quantity-btn");
+
+    // 🗑️ Eliminar producto
+    if (deleteIcon) {
+      e.stopPropagation();
+      const itemEl = deleteIcon.closest(".cart-item");
+      const index = parseInt(itemEl.dataset.index);
+      removeCartItem(index, itemEl);
+      return;
+    }
+
+    // + / -
+    if (btn) {
+      const id = btn.getAttribute("data-id");
+      if (btn.classList.contains("decrease-btn")) {
+        removeFromCart(id);
+      } else if (btn.classList.contains("increase-btn")) {
+        addToCart(id);
+      }
     }
   };
 }
+
+// 🗑️ Eliminar producto del carrito con animación
+function removeCartItem(index, itemEl) {
+  if (itemEl) {
+    itemEl.classList.add("fade-out");
+    setTimeout(() => {
+      cart.splice(index, 1);
+      updateCartDisplay();
+      renderCartItems();
+    }, 250);
+  } else {
+    cart.splice(index, 1);
+    updateCartDisplay();
+    renderCartItems();
+  }
+}
+
 
 /**
  * clearCart
@@ -835,8 +860,10 @@ function clearCart() {
     cart = [];
     updateCartDisplay();
     renderCartItems();
+    localStorage.removeItem("cart");
   }
 }
+
 
 /**
  * checkout
@@ -844,16 +871,41 @@ function clearCart() {
  * Simula el envío del pedido: muestra un resumen y limpia el carrito.
  * Aquí podría integrarse el envío real (API, WhatsApp, etc.).
  */
+/**
+ * checkout
+ * --------
+ * Inicia el proceso de pedido, validando que el carrito tenga productos
+ * y que el usuario haya seleccionado un método de pago antes de continuar.
+ */
 function checkout() {
-  if (cart.length === 0) {
-    alert("Tu carrito está vacío");
+  if (cart.length === 0) return;
+
+  // 🔒 Validar método de pago
+  const paymentSelect = document.getElementById("payment-method");
+  const paymentMethod = paymentSelect ? paymentSelect.value.trim() : "";
+
+  // Si no hay valor seleccionado → mostrar solo animación visual
+  if (!paymentMethod) {
+    paymentSelect.classList.add("shake-error");
+    paymentSelect.style.borderColor = "#e53e3e";
+    paymentSelect.style.backgroundColor = "#fff5f5";
+
+    setTimeout(() => {
+      paymentSelect.classList.remove("shake-error");
+      paymentSelect.style.borderColor = "";
+      paymentSelect.style.backgroundColor = "";
+    }, 1000);
+
+    paymentSelect.focus();
     return;
   }
 
-  // 🔥 En lugar de confirmar pedido de inmediato,
-  // abrimos el nuevo modal de tipo de entrega
+
+  // ✅ Abrir modal de tipo de entrega
   openDeliveryModal();
 }
+
+
 
 
 const deliveryModalEl = document.getElementById("delivery-modal");
