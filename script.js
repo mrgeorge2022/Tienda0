@@ -680,21 +680,27 @@ function removeFromCart(productId) {
  */
 function updateCartDisplay() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  document.getElementById("cart-count").textContent = `${totalItems} producto${
-    totalItems !== 1 ? "s" : ""
-  }`;
-  document.getElementById("cart-total").textContent = formatPrice(totalPrice);
-  document.getElementById(
-    "cart-total-modal"
-  ).textContent = `Total: ${formatPrice(totalPrice)}`;
+  const cartCountEl = document.getElementById("cart-count");
+  const cartTotalEl = document.getElementById("cart-total");
+  const cartTotalModalEl = document.getElementById("cart-total-modal");
 
-if (totalItems > 0) { cartFloatEl.classList.add("show"); } else { cartFloatEl.classList.remove("show"); }
+  if (totalItems > 0) {
+    // ✅ Hay productos: mostrar cantidad y total
+    cartFloatEl.classList.add("show-info");
+    cartCountEl.textContent = `${totalItems} producto${totalItems !== 1 ? "s" : ""}`;
+    cartTotalEl.textContent = formatPrice(totalPrice);
+    cartTotalModalEl.textContent = `Total: ${formatPrice(totalPrice)}`;
+  } else {
+    // 🟡 Carrito vacío: solo mostrar la imagen
+    cartFloatEl.classList.remove("show-info");
+    cartCountEl.textContent = "";
+    cartTotalEl.textContent = "";
+    cartTotalModalEl.textContent = "";
+  }
 }
+
 
 /**
  * openCart
@@ -804,6 +810,94 @@ function checkout() {
     return;
   }
 
+  // 🔥 En lugar de confirmar pedido de inmediato,
+  // abrimos el nuevo modal de tipo de entrega
+  openDeliveryModal();
+}
+
+
+const deliveryModalEl = document.getElementById("delivery-modal");
+
+function openDeliveryModal() {
+  // 💾 Obtener el total mostrado en el modal del carrito
+  const totalText = document.getElementById("cart-total-modal").textContent;
+  const match = totalText.match(/[\d,.]+/);
+  let cartTotal = 0;
+
+  if (match) {
+    cartTotal = Number(match[0].replace(/[.,]/g, ""));
+  }
+
+  localStorage.setItem("cartTotal", cartTotal);
+  console.log("💾 Subtotal leído del DOM y guardado:", cartTotal);
+
+  // Abrir modal
+  closeCart();
+  deliveryModalEl.classList.add("show");
+}
+
+function closeDeliveryModal() {
+  const deliveryModalEl = document.getElementById("delivery-modal");
+  if (deliveryModalEl) {
+    deliveryModalEl.classList.remove("show");
+  }
+}
+
+function selectDeliveryType(type) {
+  closeDeliveryModal();
+
+  const cartTotal = localStorage.getItem("cartTotal") || 0;
+  console.log("🧾 Total cargado desde localStorage:", cartTotal);
+
+  if (type === "Recoger en tienda" || type === "Mesa") {
+    openCustomerModal(type);
+  } else if (type === "Domicilio") {
+    console.log("➡️ Redirigiendo a domicilio.html...");
+    window.location.href = "domicilio.html";
+  }
+
+  console.log(`Pedido preparado (${type}), pendiente de envío final.`);
+}
+
+// ==========================================
+// 🧍 MODAL DE DATOS DEL CLIENTE
+// ==========================================
+const customerModalEl = document.getElementById("customer-modal");
+const customerForm = document.getElementById("customer-form");
+const mesaField = document.getElementById("mesa-field");
+let currentDeliveryType = ""; // Guardará si es tienda o mesa
+
+function openCustomerModal(type) {
+  currentDeliveryType = type;
+  document.getElementById("customer-modal-title").textContent =
+    type === "Mesa" ? "Pedido en mesa 🍽️" : "Recoger en tienda 🏬";
+
+  // Mostrar o esconder campo de mesa según el tipo
+  mesaField.style.display = type === "Mesa" ? "block" : "none";
+
+  // Limpiar formulario
+  customerForm.reset();
+  customerModalEl.classList.add("show");
+}
+
+function closeCustomerModal() {
+  customerModalEl.classList.remove("show");
+}
+
+// Manejar envío del formulario
+customerForm.addEventListener("submit", function (e) {
+  e.preventDefault();
+  const name = document.getElementById("customer-name").value.trim();
+  const phone = document.getElementById("customer-phone").value.trim();
+  const mesa = document.getElementById("customer-mesa").value.trim();
+
+  if (!name || !phone) {
+    alert("Por favor, ingresa tu nombre y número de teléfono.");
+    return;
+  }
+
+  // Construir resumen del pedido
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const orderSummary = cart
     .map(
       (item) =>
@@ -813,24 +907,23 @@ function checkout() {
     )
     .join("\n");
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  let message = `🍽️ *Nuevo Pedido (${currentDeliveryType})*\n\n👤 *Nombre:* ${name}\n📞 *Teléfono:* ${phone}`;
+  if (currentDeliveryType === "Mesa") {
+    message += `\n🍽️ *Mesa:* ${mesa || "Sin número"}`;
+  }
+  message += `\n\n${orderSummary}\n\n*Total: ${formatPrice(total)}*`;
 
-  const message = `🍽️ *Nuevo Pedido*\n\n${orderSummary}\n\n*Total: ${formatPrice(
-    total
-  )}*`;
+  // Mostrar confirmación (luego se conectará con WhatsApp o base de datos)
+  alert(`✅ Pedido registrado:\n\n${message}`);
 
-  // Here you would typically send the order to your system
-  alert(
-    `Pedido confirmado:\n\n${orderSummary}\n\nTotal: ${formatPrice(
-      total
-    )}\n\n¡Gracias por tu pedido!`
-  );
-
-  // Clear cart after successful order
+  // Limpiar todo
   cart = [];
   updateCartDisplay();
-  closeCart();
-}
+  closeCustomerModal();
+});
+
+
+
 
 // ==================================================
 // ✅ SCROLL CATEGORÍAS MEJORADO Y COMPATIBLE

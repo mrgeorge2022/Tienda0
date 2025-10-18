@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Mr. George | Restaurante</title>
-    <link rel="icon" type="image/png" href="img/icono_tienda.png">
+  <link rel="icon" type="image/png" href="img/icono_tienda.png">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -211,15 +211,15 @@
         <button class="close-product-modal" onclick="closeProductModal()">×</button>
       </div>
 
-<div class="modal-image-container">
-  <!-- Precio arriba -->
-  <div class="modal-price-overlay" id="modal-product-price">$0</div>
+      <div class="modal-image-container">
+        <!-- Precio arriba -->
+        <div class="modal-price-overlay" id="modal-product-price">$0</div>
 
-  <!-- Imagen del producto (donde JS inserta la imagen dinámica) -->
-  <div class="product-modal-image" id="modal-image-content">
-    🍽️
-  </div>
-</div>
+        <!-- Imagen del producto (donde JS inserta la imagen dinámica) -->
+        <div class="product-modal-image" id="modal-image-content">
+          🍽️
+        </div>
+      </div>
 
 
 
@@ -290,15 +290,50 @@
 
 
   <!-- Floating Cart -->
-  <div class="cart-float" id="cart-float" onclick="openCart()">
-    <div class="cart-icon">
-      <img src="iconos/carrito.png" alt="Carrito">
-    </div>
-    <div class="cart-info">
-      <div class="cart-count" id="cart-count">0 productos</div>
-      <div class="cart-total" id="cart-total">$0</div>
-    </div>
+<div class="cart-float" id="cart-float" onclick="openCart()">
+  <div class="cart-icon">
+    <img src="iconos/carrito.png" alt="Carrito">
   </div>
+  <div class="cart-info" id="cart-info">
+    <div class="cart-count" id="cart-count">0 productos</div>
+    <div class="cart-total" id="cart-total">$0</div>
+  </div>
+</div>
+
+
+
+
+
+  <!-- Modal de tipo de entrega -->
+<div class="delivery-modal" id="delivery-modal">
+  <div class="delivery-content">
+    <h3>¿Cómo quieres recibir tu pedido?</h3>
+    <div class="delivery-options">
+      <button onclick="selectDeliveryType('Domicilio')" class="delivery-option-btn">🏠 Domicilio</button>
+      <button onclick="selectDeliveryType('Recoger en tienda')" class="delivery-option-btn">🏬 Recoger en tienda</button>
+      <button onclick="selectDeliveryType('Mesa')" class="delivery-option-btn">🍽️ Mesa</button>
+    </div>
+    <button class="close-delivery" onclick="closeDeliveryModal()">Cancelar</button>
+  </div>
+</div>
+
+
+
+<!-- Modal de datos del cliente -->
+<div class="customer-modal" id="customer-modal">
+  <div class="customer-content">
+    <h3 id="customer-modal-title">Datos del pedido</h3>
+    <form id="customer-form">
+      <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
+      <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
+      <div id="mesa-field" style="display:none;">
+        <input type="text" id="customer-mesa" placeholder="🍽️ Número de mesa">
+      </div>
+      <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
+    </form>
+    <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
+  </div>
+</div>
 
 
   <!-- === FOOTER INFO === -->
@@ -343,10 +378,7 @@
           Crea tu tienda aquí
         </a>
       </div>
-
-
   </footer>
-
 
 
   <script src="horario.js"></script>

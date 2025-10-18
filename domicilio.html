@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Domicilio | Mr. George</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.min.js"></script>
+
+    <!-- Estilos -->
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 🌍 Mapa a pantalla completa */
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100vw;
+            z-index: 1;
+        }
+
+        /* 🌫️ Capa de controles encima */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0) 100%);
+            color: white;
+        }
+
+        /* 🧹 Inputs con botón limpiador integrado */
+        .input-container {
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .input-container input {
+            width: 100%;
+            padding: 10px 35px 10px 12px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            backdrop-filter: blur(8px);
+
+            background: #fff8;
+            color: #333;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            opacity: 0;
+            transition: opacity 0.2s;
+            user-select: none;
+        }
+
+        .input-container:hover .clear-btn,
+        .input-container input:not(:placeholder-shown)+.clear-btn {
+            opacity: 1;
+        }
+
+        #subtotal, #domicilio-cost {
+            font-weight: bold;
+        }
+
+        /* 📋 Estilo de sugerencias */
+        .suggestions {
+            position: absolute;
+            top: 60px;
+            width: 80%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: none;
+            z-index: 1001;
+        }
+
+        .suggestions div {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .suggestions div:hover {
+            background: #ff9800;
+            color: white;
+        }
+
+        /* 📍 Botón de ubicación actual */
+        .locate-btn {
+            position: absolute;
+            bottom: 210px;
+            right: 20px;
+            z-index: 1;
+            background: rgba(0, 136, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 26px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .locate-btn img {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .leaflet-bottom.leaflet-left {
+            display: none !important;
+            bottom: 200px !important;
+            left: 15px !important;
+        }
+
+
+
+        .leaflet-popup-content-wrapper {
+            width: 250px !important;
+            border-radius: 20px !important;
+            margin-bottom: 20px !important;
+        }
+
+
+        .leaflet-popup-tip {
+            display: none;
+        }
+
+
+
+        /* 📋 Panel de totales */
+        .panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 16px 16px 0 0;
+            padding: 15px;
+            z-index: 999;
+            color: #333;
+        }
+
+        .panel .linea {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 16px;
+        }
+
+        .panel .total {
+            font-weight: bold;
+            font-size: 18px;
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+            padding-top: 8px;
+        }
+
+        .btn-finalizar {
+            width: 100%;
+            margin-top: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .btn-finalizar:hover {
+            background: #43a047;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 🗺️ Mapa -->
+    <div id="map"></div>
+
+    <!-- 🌫️ Controles flotantes -->
+    <div class="overlay">
+        <div class="input-container">
+            <input type="text" id="buscar" placeholder="🔍 Buscar dirección o barrio..." />
+            <span class="clear-btn" id="clearBuscar">✖</span>
+        </div>
+
+        <div id="suggestions" class="suggestions"></div>
+
+        <div class="input-container">
+            <input type="text" id="referencia" placeholder="📍 Punto de referencia (opcional)" />
+            <span class="clear-btn" id="clearReferencia">✖</span>
+        </div>
+    </div>
+
+    <!-- 📍 Botón ubicación -->
+    <button id="btn-ubicacion" class="locate-btn" title="Usar ubicación actual">
+        <img src="iconos/norte.png" alt="Ubicación" />
+    </button>
+
+
+    <!-- 💰 Panel de totales -->
+    <div class="panel">
+        <div class="linea">
+            <span id="subtotal-label">Subtotal productos:</span>
+            <span id="subtotal">$0</span>
+        </div>
+        <div class="linea">
+            <span id="domicilio-label">Costo domicilio:</span>
+            <span id="domicilio-cost">Pendiente</span>
+        </div>
+        <div class="linea total">
+            <span>Total a pagar:</span>
+            <span id="total">$0</span>
+        </div>
+        <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar pedido</button>
+    </div>
+
+    <!-- Script -->
+    <script>
+        document.getElementById("clearBuscar").addEventListener("click", () => {
+            document.getElementById("buscar").value = "";
+            document.getElementById("buscar").focus();
+        });
+
+        document.getElementById("clearReferencia").addEventListener("click", () => {
+            document.getElementById("referencia").value = "";
+            document.getElementById("referencia").focus();
+        });
+    </script>
+
+    <script src="domicilio.js"></script>
+</body>
+
+</html>
