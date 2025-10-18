@@ -42,14 +42,14 @@ document.addEventListener("DOMContentLoaded", function () {
 function updateProductButtons() {
   const addButtons = document.querySelectorAll(".add-button");
   addButtons.forEach((btn) => {
-    // El botón + es solo visual: siempre muestra '+' y solo se aplica la clase
-    // 'inactive' para estilos cuando el local está cerrado.
-    // Mantener siempre habilitado visualmente; la disponibilidad real viene de product.activo
     btn.classList.remove("inactive");
-    // Asegurar símbolo visual
-    btn.textContent = "+";
+    // Elimina texto fijo y asegúrate de que tenga la imagen
+    if (!btn.querySelector("img")) {
+      btn.innerHTML = `<img src="iconos/add.png" alt="Agregar" class="add-icon">`;
+    }
   });
 }
+
 
 // Load products from Google Sheets
 /**
@@ -297,7 +297,10 @@ function createProductCard(product) {
             ${description}
             <div class="product-price">${formatPrice(product.precio)}</div>
         </div>
-    <div class="add-button">+</div>
+<div class="add-button">
+  <img src="iconos/add.png" alt="Agregar" class="add-icon">
+</div>
+
         <div class="product-actions">
             <div class="closed-message" style="display: none;">
                 <span id="closed-msg-${product.id}">Cerrado</span>
@@ -514,6 +517,14 @@ function updateAddToCartButton() {
  * su cantidad. Si tiene instrucciones diferentes, crea una línea nueva.
  */
 function addToCartFromModal() {
+
+  // 🚫 Bloquear si la tienda está cerrada
+  if (!window.tiendaAbierta) {
+    alert("⏰ Lo sentimos, la tienda está cerrada. Te invitamos a ver nuestro horario.");
+    closeProductModal();
+    return;
+  }
+
   if (!currentProduct) return;
 
   // --- CAPTURAR OPCIONES DE CONFIGURACIÓN ---
@@ -596,6 +607,14 @@ function addToCartFromModal() {
  * @param {string} productId
  */
 function addToCart(productId) {
+
+  // 🚫 Bloquear si la tienda está cerrada
+  if (!window.tiendaAbierta) {
+    alert("⏰ Lo sentimos, la tienda está cerrada. Te invitamos a ver nuestro horario.");
+    return;
+  }
+
+
   // Try to find the cart line by exact id (cart item id)
   const asStr = String(productId);
 
@@ -708,18 +727,39 @@ function updateCartDisplay() {
  * Muestra el modal del carrito y renderiza los items actuales.
  */
 function openCart() {
-  cartModalEl.classList.add("show");
+  const cartModal = document.getElementById("cart-modal");
+  const cartContent = cartModal.querySelector(".cart-content");
+
+  // Asegurar visibilidad (Safari fix)
+  cartModal.style.display = "flex";
+  cartModal.classList.add("show");
+  cartModal.classList.remove("hide");
+
+  // Reiniciar animaciones para evitar bugs
+  cartContent.style.animation = "none";
+  void cartContent.offsetWidth; // forzar reflow
+  cartContent.style.animation = "slideInCart 0.4s ease forwards";
+
   renderCartItems();
 }
 
-/**
- * closeCart
- * ---------
- * Cierra el modal del carrito.
- */
 function closeCart() {
-  cartModalEl.classList.remove("show");
+  const cartModal = document.getElementById("cart-modal");
+  const cartContent = cartModal.querySelector(".cart-content");
+
+  // Ejecutar animación de salida
+  cartContent.style.animation = "slideOutCart 0.4s ease forwards";
+  cartModal.classList.remove("show");
+  cartModal.classList.add("hide");
+
+  // Esperar fin de animación
+  setTimeout(() => {
+    cartModal.style.display = "none";
+    cartModal.classList.remove("hide");
+    cartContent.style.animation = "";
+  }, 400);
 }
+
 
 /**
  * renderCartItems

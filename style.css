@@ -605,6 +605,12 @@ body::before {
     z-index: 30;
 }
 
+.add-button img.add-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
 .add-button:hover {
     transform: translate(35%, 35%) scale(1.06);
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35), 0 4px 10px rgba(0, 0, 0, 0.14);
@@ -676,6 +682,8 @@ body::before {
     align-items: center;
     justify-content: center;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    width: 70px;
+    height: 70px;
 }
 
 
@@ -984,7 +992,7 @@ body::before {
     justify-content: center;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 20px;
     color: #565a5f;
     transition: all 0.3s ease;
 }
@@ -1012,11 +1020,11 @@ body::before {
     background: var(--accent);
     color: white;
     border: none;
-    padding: 15px;
+    padding: 10px;
     border-radius: 50px;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 15px;
     transition: all 0.3s ease;
 }
 
@@ -1464,7 +1472,7 @@ body::before {
     }
 
     .cart-float {
-        bottom: 15px;
+        bottom: 40px;
         right: 15px;
         padding: 12px 20px;
     }

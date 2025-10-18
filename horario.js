@@ -4,14 +4,19 @@
 const SCHEDULE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOCBCR_1CsQJz9YljFyiL3YxgnvlUy_eEQMSmmIf9jvsCt0aO0RjoUD0yfTbq1_liXXQ/exec';
 
 const defaultSchedule = [
-    { day: 'Lunes', open: '11:00', close: '23:59', estado: true },
-    { day: 'Martes', open: '11:00', close: '23:59', estado: true },
-    { day: 'Miércoles', open: '11:00', close: '23:59', estado: false },
-    { day: 'Jueves', open: '11:00', close: '23:59', estado: true },
-    { day: 'Viernes', open: '11:00', close: '23:59', estado: true },
-    { day: 'Sábado', open: '11:00', close: '23:59', estado: true },
-    { day: 'Domingo', open: '11:00', close: '23:59', estado: true }
+    { day: 'Lunes', open: '11:00', close: '00:00', estado: true },
+    { day: 'Martes', open: '11:00', close: '00:00', estado: true },
+    { day: 'Miércoles', open: '11:00', close: '00:00', estado: false },
+    { day: 'Jueves', open: '11:00', close: '00:00', estado: true },
+    { day: 'Viernes', open: '11:00', close: '00:00', estado: true },
+    { day: 'Sábado', open: '11:00', close: '00:00', estado: true },
+    { day: 'Domingo', open: '11:00', close: '00:00', estado: true }
 ];
+
+// ===============================
+// VARIABLE GLOBAL COMPARTIDA
+// ===============================
+window.tiendaAbierta = false; // <- esta variable se usará en script.js
 
 // ===============================
 // UTILIDADES
@@ -52,8 +57,6 @@ function parseHour(v) {
 // FUNCIÓN PRINCIPAL
 // ===============================
 async function loadSchedule() {
-    const statusHeader = document.getElementById('status-header');
-
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000);
@@ -100,6 +103,7 @@ function updateStatus(scheduleData, currentDay) {
     const todaySchedule = scheduleData.find(item => item.day === currentDay);
 
     if (!todaySchedule || !todaySchedule.estado) {
+        window.tiendaAbierta = false;
         setClosed(statusHeader, 'Hoy la tienda está cerrada.');
         return;
     }
@@ -111,8 +115,9 @@ function updateStatus(scheduleData, currentDay) {
     const closeTime = new Date();
     closeTime.setHours(closeHour, closeMinute, 0, 0);
 
-    // Si está abierta actualmente
+    // Está abierta
     if (now >= openTime && now <= closeTime) {
+        window.tiendaAbierta = true;
         const timeUntilClose = closeTime - now;
         const hours = Math.floor(timeUntilClose / (1000 * 60 * 60));
         const minutes = Math.floor((timeUntilClose % (1000 * 60 * 60)) / (1000 * 60));
@@ -123,48 +128,42 @@ function updateStatus(scheduleData, currentDay) {
                 ? `Cierra en ${minutes} minuto${minutes !== 1 ? 's' : ''}`
                 : `Cierra pronto.`;
         setOpen(statusHeader, '¡La tienda está abierta!', closeText);
-
-    // Si está cerrada actualmente
     } else {
+        window.tiendaAbierta = false;
         const nextOpen = new Date(openTime);
         if (now > openTime) nextOpen.setDate(nextOpen.getDate() + 1);
 
-        // Formato legible de hora (12h con AM/PM)
         let openHours = openHour % 12 || 12;
         const openMinutes = String(openMinute).padStart(2, '0');
         const period = openHour >= 12 ? 'PM' : 'AM';
         const openFormatted = `${openHours}:${openMinutes} ${period}`;
 
-        const openText = now > closeTime 
-    ? `Abre mañana a las ${openFormatted}` 
-    : `Abre a las ${openFormatted}`;
+        const openText =
+            now > closeTime
+                ? `Abre mañana a las ${openFormatted}`
+                : `Abre a las ${openFormatted}`;
         setClosed(statusHeader, 'La tienda está cerrada.', openText);
     }
 }
-
 
 // ===============================
 // ESTILOS VISUALES DE ESTADO
 // ===============================
 function setOpen(el, title, subtitle = '') {
-  const subtext = document.getElementById('status-subtext');
-  el.style.setProperty('--status-bg', '#2ecc71'); // verde
-  el.style.setProperty('--text-color', '#fff');
-  
-  el.textContent = title; // Solo el texto principal
-  subtext.textContent = subtitle; // Subtexto aparte
+    const subtext = document.getElementById('status-subtext');
+    el.style.setProperty('--status-bg', '#2ecc71');
+    el.style.setProperty('--text-color', '#fff');
+    el.textContent = title;
+    subtext.textContent = subtitle;
 }
 
 function setClosed(el, title, subtitle = '') {
-  const subtext = document.getElementById('status-subtext');
-  el.style.setProperty('--status-bg', '#e74c3c'); // rojo
-  el.style.setProperty('--text-color', '#fff');
-  
-  el.textContent = title;
-  subtext.textContent = subtitle;
+    const subtext = document.getElementById('status-subtext');
+    el.style.setProperty('--status-bg', '#e74c3c');
+    el.style.setProperty('--text-color', '#fff');
+    el.textContent = title;
+    subtext.textContent = subtitle;
 }
-
-
 
 // ===============================
 // EJECUCIÓN AUTOMÁTICA
