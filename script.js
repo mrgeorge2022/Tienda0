@@ -924,7 +924,6 @@ function openDeliveryModal() {
   console.log("💾 Subtotal leído del DOM y guardado:", cartTotal);
 
   // Abrir modal
-  closeCart();
   deliveryModalEl.classList.add("show");
 }
 
@@ -976,43 +975,86 @@ function closeCustomerModal() {
   customerModalEl.classList.remove("show");
 }
 
-// Manejar envío del formulario
-customerForm.addEventListener("submit", function (e) {
-  e.preventDefault();
+
+// ============================================
+// 🧾 FORMULARIO DE DATOS DEL CLIENTE (ENVÍO A WHATSAPP)
+// ============================================
+customerForm.addEventListener("submit", (e) => {
+  e.preventDefault(); // Evitar recarga
+
   const name = document.getElementById("customer-name").value.trim();
   const phone = document.getElementById("customer-phone").value.trim();
-  const mesa = document.getElementById("customer-mesa").value.trim();
+  const mesa = document.getElementById("customer-mesa")?.value.trim() || null;
+  const metodoPago = document.getElementById("payment-method")?.value || "No especificado";
 
   if (!name || !phone) {
-    alert("Por favor, ingresa tu nombre y número de teléfono.");
+    alert("Por favor ingresa tu nombre y teléfono.");
     return;
   }
 
-  // Construir resumen del pedido
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const orderSummary = cart
-    .map(
-      (item) =>
-        `${item.quantity}x ${item.name} - ${formatPrice(
-          item.price * item.quantity
-        )}`
-    )
-    .join("\n");
+  // 🧮 Calcular totales
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const productos = cart.map(item => ({
+    nombre: item.name,
+    precio: item.price,
+    cantidad: item.quantity,
+    instrucciones: item.instructions || ""
+  }));
 
-  let message = `🍽️ *Nuevo Pedido (${currentDeliveryType})*\n\n👤 *Nombre:* ${name}\n📞 *Teléfono:* ${phone}`;
-  if (currentDeliveryType === "Mesa") {
-    message += `\n🍽️ *Mesa:* ${mesa || "Sin número"}`;
-  }
-  message += `\n\n${orderSummary}\n\n*Total: ${formatPrice(total)}*`;
+  // 🕒 Generar fecha y hora actual
+  const fecha = new Date();
+  const fechaTexto = fecha.toLocaleDateString("es-CO");
+  const horaTexto = fecha.toTimeString().split(" ")[0]; // Hora militar HH:MM:SS
 
-  // Mostrar confirmación (luego se conectará con WhatsApp o base de datos)
-  alert(`✅ Pedido registrado:\n\n${message}`);
+  // 🧾 Generar número de factura
+  const nombreCodigo = name.substring(0, 3).toUpperCase();
+  const telefonoCodigo = phone.slice(-3);
+  const factura = `#${nombreCodigo}${telefonoCodigo}${fecha.getFullYear().toString().slice(-2)}${String(fecha.getMonth() + 1).padStart(2, '0')}${String(fecha.getDate()).padStart(2, '0')}${String(fecha.getHours()).padStart(2, '0')}${String(fecha.getMinutes()).padStart(2, '0')}${String(fecha.getSeconds()).padStart(2, '0')}`;
 
-  // Limpiar todo
-  cart = [];
-  updateCartDisplay();
-  closeCustomerModal();
+  // 💰 Totales
+  const costoDomicilio = 0;
+  const total = subtotal + costoDomicilio;
+  const propina = Math.round(total * 0.10);
+  const totalConPropina = total + propina;
+
+// 📝 Capturar observaciones del carrito (si existen)
+const observaciones =
+  document.getElementById("cart-notes")?.value.trim() || "";
+
+// 📦 Crear objeto del pedido
+const pedido = {
+  tipoEntrega: currentDeliveryType,
+  factura,
+  fecha: fechaTexto,
+  hora: horaTexto,
+  cliente: {
+    nombre: name,
+    telefono: phone,
+    mesa: currentDeliveryType === "Mesa" ? mesa : null // 👈 aquí capturamos el número de mesa
+  },
+  direccion: currentDeliveryType === "Domicilio" ? (document.getElementById("buscar")?.value || "") : "",
+  referencia: "",
+  productos,
+  subtotal,
+  costoDomicilio,
+  total,
+  metodoPago,
+  propina,
+  totalConPropina,
+  observaciones,
+  ubicacion: null
+};
+
+
+// 🚀 Enviar pedido a WhatsApp
+enviarPedidoWhatsApp(pedido);
+
+// 🧹 Limpiar carrito y cerrar modal
+cart = [];
+updateCartDisplay();
+closeCustomerModal();
 });
+
 
 
 

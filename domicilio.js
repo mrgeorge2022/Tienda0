@@ -397,17 +397,119 @@ function redondearACien(valor) {
 }
 
 // ================================
-// 🧾 FINALIZAR PEDIDO
+// 🧾 FINALIZAR PEDIDO (SIEMPRE PIDE DATOS) Y ENVIAR A WHATSAPP
 // ================================
 function finalizarPedido() {
-  const ref = document.getElementById("referencia").value.trim();
-  const { lat, lng } = markerUsuario.getLatLng();
-  alert(`✅ Dirección confirmada\nLat: ${lat}\nLng: ${lng}\nRef: ${ref}`);
+  // Mostrar siempre el modal para confirmar nombre y teléfono
+  const modal = document.getElementById("customer-modal");
+  const form = document.getElementById("customer-form");
+
+  // Precargar valores guardados (si existen)
+  document.getElementById("customer-name").value =
+    localStorage.getItem("customerName") || "";
+  document.getElementById("customer-phone").value =
+    localStorage.getItem("customerPhone") || "";
+
+  modal.classList.add("show");
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+
+    const nombre = document.getElementById("customer-name").value.trim();
+    const telefono = document.getElementById("customer-phone").value.trim();
+
+    if (!nombre || !telefono) {
+      alert("Por favor completa tu nombre y teléfono antes de continuar.");
+      return;
+    }
+
+    // Guardar datos para próximos pedidos
+    localStorage.setItem("customerName", nombre);
+    localStorage.setItem("customerPhone", telefono);
+
+    modal.classList.remove("show");
+
+    // Continuar con el flujo de envío a WhatsApp
+    enviarPedidoDomicilio(nombre, telefono);
+  };
 }
 
 // ================================
+// 🚀 CONSTRUIR Y ENVIAR PEDIDO (DOMICILIO)
+// ================================
+function enviarPedidoDomicilio(nombre, telefono) {
+  const direccion = document.getElementById("buscar").value.trim();
+  const referencia = document.getElementById("referencia").value.trim();
+  const metodoPago = document.getElementById("metodo-pago")?.value || "No especificado";
+  const observaciones = document.getElementById("observaciones")?.value || "";
+  const { lat, lng } = markerUsuario.getLatLng();
+
+  const carrito = JSON.parse(localStorage.getItem("cart")) || [];
+  const subtotal = Number(localStorage.getItem("cartTotal")) || 0;
+  const totalPagar = subtotal + costoDomicilio;
+  const propina = Math.round(totalPagar * 0.1);
+  const totalConPropina = totalPagar + propina;
+
+  // Generar factura
+  const factura = generarFacturaId(nombre, telefono);
+
+  const pedido = {
+    tipoEntrega: "Domicilio",
+    factura,
+    fecha: new Date().toLocaleDateString("es-CO"),
+    hora: new Date().toLocaleTimeString("es-CO", { hour12: false }),
+    cliente: { nombre, telefono },
+    direccion,
+    referencia,
+    productos: carrito.map(p => ({
+      nombre: p.name,
+      precio: p.price,
+      cantidad: p.quantity,
+      instrucciones: p.instructions || ""
+    })),
+    subtotal,
+    costoDomicilio,
+    total: totalPagar,
+    metodoPago,
+    propina,
+    totalConPropina,
+    observaciones,
+    ubicacion: `https://www.google.com/maps?q=${lat},${lng}`,
+  };
+
+  enviarPedidoWhatsApp(pedido);
+}
+
+// ================================
+// 🧮 Generar ID de factura único
+// ================================
+function generarFacturaId(nombre, telefono) {
+  const prefijo = nombre.substring(0, 3).toUpperCase();
+  const sufijo = telefono.slice(-3);
+  const now = new Date();
+  const año = now.getFullYear().toString().slice(-2);
+  const mes = String(now.getMonth() + 1).padStart(2, "0");
+  const dia = String(now.getDate()).padStart(2, "0");
+  const hora = String(now.getHours()).padStart(2, "0");
+  const minutos = String(now.getMinutes()).padStart(2, "0");
+  const segundos = String(now.getSeconds()).padStart(2, "0");
+  return `#${prefijo}${sufijo}${año}${mes}${dia}${hora}${minutos}${segundos}`;
+}
+
+// ================================
+// 🔧 Cerrar modal
+// ================================
+function closeCustomerModal() {
+  document.getElementById("customer-modal").classList.remove("show");
+}
+
+// ================================
+// 🗺️ Inicialización
+// ================================
 window.addEventListener("DOMContentLoaded", () => {
   initMap();
-  actualizarCostos(); // usa la hora real
+  actualizarCostos();
 });
+
+
 

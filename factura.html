@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Factura - Pedido</title>
+  <style>
+    :root {
+      --text: #222;
+      --muted: #555;
+    }
+
+    body {
+      font-family: "Helvetica", Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page {
+      background: #fff;
+      margin: auto;
+      padding: 10px;
+      max-width: 800px;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 8px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ==== HEADER ==== */
+    .header-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 10px;
+      margin-top: 30px;
+    }
+
+    .header-column .logo {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+
+    .header-column .logo img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .header-column .store-info h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .header-column .store-info p {
+      margin: 2px 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .header-column .factura-info {
+      margin-top: 4px;
+      font-size: 0.9rem;
+    }
+
+    /* ==== CONTENIDO ==== */
+    .meta {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    hr {
+      border: none;
+      border-top: 1px dashed #ddd;
+      margin: 10px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid #eee;
+      padding: 4px 0;
+      text-align: left;
+    }
+
+    td.qty, td.price {
+      text-align: left;
+    }
+
+    td.total {
+      text-align: right;
+    }
+
+    .total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+
+    .totals .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      padding: 2px 0;
+    }
+
+    .totals .row.total {
+      font-weight: bold;
+      border-top: 1px dashed #ccc;
+      margin-top: 4px;
+      padding-top: 4px;
+    }
+
+    .observaciones {
+        margin-top: 20px;
+        font-size: 15px;
+    }
+
+    
+    .footer {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .print-actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    /* ✅ Autoajuste para impresión térmica (50 mm – 80 mm) */
+    @media print and (max-width: 80mm) {
+      body {
+        background: white;
+      }
+      .page {
+        padding: 5px;
+        font-size: 9px;
+        max-width: 58mm;
+        box-shadow: none;
+      }
+      table {
+        font-size: 9px;
+      }
+      .totals .row {
+        font-size: 9px;
+      }
+      .footer {
+        font-size: 8px;
+      }
+      .header-column .logo {
+        width: 50px;
+        height: 50px;
+      }
+      .header-column .store-info h2 {
+        font-size: 0.9rem;
+      }
+      .header-column .store-info p {
+        font-size: 0.7rem;
+      }
+      .print-actions {
+        display: none !important;
+      }
+    }
+
+    /* ✅ Estilo amplio (A4 o carta) */
+    @media print and (min-width: 100mm) {
+      .page {
+        width: 210mm;
+        padding: 15mm;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      table {
+        font-size: 13px;
+      }
+    }
+
+    /* Quita botones al imprimir */
+    @media print {
+      .print-actions {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="page">
+    <header class="header-column">
+      <div class="logo">
+        <img src="img/icono_tienda.png" alt="Logo de Mr. George">
+      </div>
+
+      <div class="store-info">
+        <h2 id="store-name">Mr. George</h2>
+        <p id="store-address">Cartagena, Bolívar<br>San Fernando, Cl 5, Cra 81 f 05</p>
+        <p id="store-phone">Tel: 302 266 6530</p>
+      </div>
+
+      <div class="factura-info">
+        <span style="font-size:12px;color:var(--muted)">FACTURA</span>
+        <div id="factura-num" style="font-weight:700;font-size:16px"></div>
+      </div>
+    </header>
+
+    <div class="meta">
+      <div class="left">
+        <span id="cliente-nombre">Cliente: ---</span><br>
+        <span id="cliente-phone">Tel: ---</span><br>
+        <span id="cliente-direccion">Dirección: ---</span><br>
+        <div id="fecha">Fecha: --</div>
+        <div id="hora">Hora: --</div>
+        <div id="tipo-entrega">Tipo: --</div>
+      </div>
+    </div>
+
+    <hr />
+
+    <table id="items-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th class="qty">Cant.</th>
+          <th class="price">Precio</th>
+          <th class="total">Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="totals">
+      <div class="row">
+        <div>Subtotal</div>
+        <div id="subtotal">$0</div>
+      </div>
+      <div class="row">
+        <div>Domicilio</div>
+        <div id="costo-domicilio">$0</div>
+      </div>
+      <div class="row total">
+        <div>Total sin propina</div>
+        <div id="total-sin-propina"><strong>$0</strong></div>
+      </div>
+      <div class="row">
+        <div>Propina (10%)</div>
+        <div id="propina">$0</div>
+      </div>
+      <div class="row total">
+        <div>Total con propina</div>
+        <div id="total-pagar">$0</div>
+      </div>
+    </div>
+
+    <div class="observaciones">
+      <strong>Observaciones:</strong>
+      <div id="obs-text">—</div>
+    </div>
+
+    <div class="footer">
+      <div>Gracias por su compra</div>
+      <div>Documento impreso para respaldo del pedido</div>
+      <div style="color:#999;font-size:10px">Factura generada por sistema - Mr. George</div>
+    </div>
+
+    <div class="print-actions">
+      <button id="btn-print">🖨️ Imprimir</button>
+      <button id="btn-close">✖ Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const raw = localStorage.getItem('lastPedido');
+      if (!raw) {
+        document.getElementById('page').innerHTML =
+          '<p style="padding:18px;text-align:center;color:#c00">No se encontró información del pedido.</p>';
+        return;
+      }
+
+      let pedido;
+      try { pedido = JSON.parse(raw); } catch (e) { return; }
+
+      const formato = n => '$' + Number(n || 0).toLocaleString('es-CO');
+
+      document.getElementById('factura-num').textContent = pedido.factura || '—';
+      document.getElementById('cliente-nombre').textContent = `Cliente: ${pedido.cliente?.nombre || ''}`;
+      document.getElementById('cliente-phone').textContent = `Tel: ${pedido.cliente?.telefono || ''}`;
+      document.getElementById('cliente-direccion').textContent = `Dirección: ${pedido.direccion || ''}`;
+      document.getElementById('fecha').textContent = `Fecha: ${pedido.fecha || ''}`;
+      document.getElementById('hora').textContent = `Hora: ${pedido.hora || ''}`;
+      document.getElementById('tipo-entrega').textContent = `Tipo: ${pedido.tipoEntrega || ''}`;
+
+      const tbody = document.querySelector('#items-table tbody');
+      tbody.innerHTML = '';
+      (pedido.productos || []).forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <strong>${p.nombre}</strong><br>
+            ${p.instrucciones ? `<small style="color:#666">${p.instrucciones}</small>` : ''}
+          </td>
+          <td class="qty">${p.cantidad || 1}</td>
+          <td class="price">${formato(p.precio)}</td>
+          <td class="total">${formato((p.precio || 0) * (p.cantidad || 1))}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // 🧾 Calcular totales
+      const subtotal = Number(pedido.subtotal || 0);
+      const costoDomicilio = Number(pedido.costoDomicilio || 0);
+      const propina = Number(pedido.propina || 0);
+      const totalSinPropina = subtotal + costoDomicilio;
+      const totalConPropina = totalSinPropina + propina;
+
+      // Mostrar totales
+      document.getElementById('subtotal').textContent = formato(subtotal);
+      document.getElementById('costo-domicilio').textContent = formato(costoDomicilio);
+      document.getElementById('total-sin-propina').textContent = formato(totalSinPropina);
+      document.getElementById('propina').textContent = formato(propina);
+      document.getElementById('total-pagar').textContent = formato(totalConPropina);
+      document.getElementById('obs-text').textContent = pedido.observaciones || '';
+
+      // Si propina = 0, ocultar línea
+      if (!propina) {
+        document.querySelector('#propina').parentElement.style.display = 'none';
+      }
+
+      document.getElementById('btn-print').addEventListener('click', () => window.print());
+      document.getElementById('btn-close').addEventListener('click', () => window.close());
+
+      // autoimprimir tras abrir
+      setTimeout(() => window.print(), 800);
+    })();
+  </script>
+</body>
+</html>
