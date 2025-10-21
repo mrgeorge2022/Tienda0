@@ -157,16 +157,16 @@ function mostrarModalFactura() {
   modal.querySelector("#btn-inicio").addEventListener("click", () => {
     modal.remove();
 
-    // 🧹 Limpiar completamente el localStorage
+    // 🧹 Limpiar completamente el localStorage y sessionStorage
     try {
       localStorage.clear();
-      sessionStorage.clear(); // (por si usas sessionStorage también)
-      console.log("🧹 Todos los datos del almacenamiento fueron borrados.");
+      sessionStorage.clear();
+      console.log("🧹 Todo el almacenamiento fue limpiado correctamente.");
     } catch (e) {
-      console.warn("Error al limpiar localStorage:", e);
+      console.warn("⚠️ Error al limpiar localStorage:", e);
     }
 
     // 🔄 Redirigir al inicio
-    window.location.href = "RedigiaIndex.html";
+    window.location.href = "index.html";
   });
 }

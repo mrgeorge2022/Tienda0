@@ -897,6 +897,7 @@ function checkout() {
     }, 1000);
 
     paymentSelect.focus();
+
     return;
   }
 
@@ -961,7 +962,7 @@ let currentDeliveryType = ""; // Guardará si es tienda o mesa
 function openCustomerModal(type) {
   currentDeliveryType = type;
   document.getElementById("customer-modal-title").textContent =
-    type === "Mesa" ? "Pedido en mesa 🍽️" : "Recoger en tienda 🏬";
+    type === "Mesa" ? "Pedido en mesa" : "Recoger en tienda";
 
   // Mostrar o esconder campo de mesa según el tipo
   mesaField.style.display = type === "Mesa" ? "block" : "none";
@@ -974,6 +975,8 @@ function openCustomerModal(type) {
 function closeCustomerModal() {
   customerModalEl.classList.remove("show");
 }
+
+
 
 
 // ============================================
@@ -1200,3 +1203,13 @@ cartModalEl.addEventListener("click", (e) => {
 productModalEl.addEventListener("click", (e) => {
   if (e.target === productModalEl) closeProductModal();
 });
+
+
+
+
+
+
+
+
+
+

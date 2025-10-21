@@ -69,15 +69,30 @@
 <!-- 🧾 Modal de datos del cliente -->
 <div class="customer-modal" id="customer-modal">
   <div class="customer-content">
-    <h3 id="customer-modal-title">Datos del pedido</h3>
+    <h3 id="customer-modal-title">Domicilio</h3>
     <p class="customer-subtitle">
       Estás a un paso de confirmar tu pedido<br>
       Solo ingresa estos datos y ¡listo!
     </p>
 
-    <form id="customer-form">
-      <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
-      <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
+    <form id="customer-form" novalidate>
+      <input 
+        type="text" 
+        id="customer-name" 
+        placeholder="👤 Nombre completo" 
+        required 
+        minlength="3"
+        pattern="^[a-zA-ZÀ-ÿ\s]{3,50}$"
+      >
+
+      <input 
+        type="tel" 
+        id="customer-phone" 
+        placeholder="📞 Ejemplo: +573022666530" 
+        required 
+        pattern="^\+?[0-9\s]{7,}$"
+      >
+
       <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
     </form>
 
