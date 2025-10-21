@@ -1,3 +1,8 @@
+
+
+
+
+
 // ================================
 // 🗺️ MAPA LEAFLET - DOMICILIO CON RUTA, COSTO Y BUSCADOR INTELIGENTE + BARRIOS PREDEFINIDOS
 // ================================
@@ -512,4 +517,36 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
+
+
+
+
+
+
+
+
+//boton de localicacion automatica en una posicion buena 
+
+
+const panel = document.getElementById('panel-totales');
+const btnLocate = document.getElementById('btn-ubicacion');
+
+function posicionarBoton() {
+    // Altura total del panel
+    const alturaPanel = panel.offsetHeight;
+
+    // Posicionamos el botón justo encima del panel
+    btnLocate.style.bottom = `${alturaPanel + 20}px`; // +10px para separarlo un poco
+}
+
+// Inicial
+posicionarBoton();
+
+// Actualiza la posición si cambia el tamaño del panel
+const observer = new MutationObserver(posicionarBoton);
+observer.observe(panel, { childList: true, subtree: true, attributes: true });
+
+// También al redimensionar la ventana
+window.addEventListener('resize', posicionarBoton);
 
