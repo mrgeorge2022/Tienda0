@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Factura - Pedido</title>
+  <title>Factura | Mr. George</title>
+  <link rel="icon" type="image/png" href="img/icono_tienda.png">
   <style>
     :root {
       --text: #1a1a1a;
@@ -29,7 +30,6 @@
       padding: 30px 25px;
       max-width: 800px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
       box-sizing: border-box;
     }
 
@@ -344,7 +344,6 @@
     <div class="footer">
       <div>Gracias por su compra</div>
       <div>Documento impreso para respaldo del pedido</div>
-      <div style="color:#999;font-size:10px">Factura generada por sistema - Mr. George</div>
     </div>
 
     <div class="print-actions">
@@ -367,13 +366,22 @@
 
       const formato = n => '$' + Number(n || 0).toLocaleString('es-CO');
 
-      document.getElementById('factura-num').textContent = pedido.factura || '—';
+      document.getElementById('factura-num').textContent = (pedido.factura || '—').toUpperCase();
       document.getElementById('cliente-nombre').textContent = `Cliente: ${pedido.cliente?.nombre || ''}`;
       document.getElementById('cliente-phone').textContent = `Tel: ${pedido.cliente?.telefono || ''}`;
       document.getElementById('cliente-direccion').textContent = `Dirección: ${pedido.direccion || ''}`;
       document.getElementById('fecha').textContent = `Fecha: ${pedido.fecha || ''}`;
       document.getElementById('hora').textContent = `Hora: ${pedido.hora || ''}`;
       document.getElementById('tipo-entrega').textContent = `Tipo: ${pedido.tipoEntrega || ''}`;
+
+      // 🍽️ Mostrar número de mesa si el pedido es en mesa
+      if (pedido.tipoEntrega === "Mesa" && pedido.cliente?.mesa) {
+        const mesaEl = document.createElement("div");
+        mesaEl.id = "mesa-num";
+        mesaEl.textContent = `Mesa: ${pedido.cliente.mesa}`;
+        document.querySelector(".meta .left").appendChild(mesaEl);
+      }
+
 
       const tbody = document.querySelector('#items-table tbody');
       tbody.innerHTML = '';
@@ -404,6 +412,17 @@
       document.getElementById('propina').textContent = formato(propina);
       document.getElementById('total-pagar').textContent = formato(totalConPropina);
       document.getElementById('obs-text').textContent = pedido.observaciones || '';
+      // 💰 Mostrar método de pago debajo del total con propina
+      const totalsDiv = document.querySelector(".totals");
+      const metodoPagoRow = document.createElement("div");
+      metodoPagoRow.classList.add("row");
+      metodoPagoRow.style.marginTop = "6px";
+      metodoPagoRow.innerHTML = `
+  <div><strong>Método de pago</strong></div>
+  <div><strong>${pedido.metodoPago || 'No especificado'}</strong></div>
+`;
+      totalsDiv.appendChild(metodoPagoRow);
+
 
       // Si propina = 0, ocultar línea
       if (!propina) {
@@ -415,6 +434,45 @@
         localStorage.removeItem('lastPedido'); // 🧹 Limpia la factura almacenada
         window.location.href = 'index.html';   // 🔙 Regresa al inicio
       });
+
+      // 🧭 Si es domicilio y tiene ubicación, generar QR exacto de Google Maps
+      if (pedido.tipoEntrega === "Domicilio" && pedido.ubicacion) {
+        const qrContainer = document.createElement("div");
+        qrContainer.style.textAlign = "center";
+        qrContainer.style.marginTop = "20px";
+
+        const qrTitle = document.createElement("p");
+        qrTitle.textContent = "Escanea para saber la ubicación de este pedido";
+        qrTitle.style.fontSize = "0.9rem";
+        qrTitle.style.color = "#333";
+
+        const qrImage = document.createElement("img");
+        qrImage.alt = "Código QR ubicación exacta";
+        qrImage.style.width = "160px";
+        qrImage.style.height = "160px";
+        qrImage.style.marginTop = "8px";
+
+        // 🧩 Aseguramos que el QR contenga TODO el enlace completo sin pérdida de caracteres
+        const linkCompleto = pedido.ubicacion.trim();
+        const linkCodificado = encodeURIComponent(linkCompleto);
+
+        // URL exacta del QR, sin recortes ni concatenaciones
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${linkCodificado}&size=160x160&margin=0&qzone=1`;
+
+        qrContainer.appendChild(qrTitle);
+        qrContainer.appendChild(qrImage);
+
+        document.querySelector(".footer").before(qrContainer);
+
+        // 🔍 También imprimimos el link debajo por respaldo
+        const linkTexto = document.createElement("p");
+        linkTexto.textContent = linkCompleto;
+        linkTexto.style.fontSize = "0.75rem";
+        linkTexto.style.color = "#666";
+        linkTexto.style.wordBreak = "break-all";
+        linkTexto.style.marginTop = "6px";
+        qrContainer.appendChild(linkTexto);
+      }
 
 
       // autoimprimir tras abrir

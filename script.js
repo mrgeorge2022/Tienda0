@@ -529,14 +529,15 @@ function addToCartFromModal() {
 
   // --- Capturar opciones de configuración ---
   let extraInstructions = "";
-  try {
-    if (window.ProductosVariable && typeof window.ProductosVariable.collectProductConfigInstructions === 'function') {
-      extraInstructions = window.ProductosVariable.collectProductConfigInstructions();
-    }
-  } catch (e) {
-    console.warn('Error al recoger opciones variables:', e);
-    extraInstructions = '';
+if (window.ProductosVariable && typeof window.ProductosVariable.collectProductConfigInstructions === 'function') {
+  const result = window.ProductosVariable.collectProductConfigInstructions();
+  if (result === null) {
+    // ❌ Si no pasó validación, no agregamos al carrito
+    return;
   }
+  extraInstructions = result;
+}
+
 
   const instructions = [
     document.getElementById("product-instructions").value.trim(),
@@ -884,7 +885,7 @@ function checkout() {
   const paymentSelect = document.getElementById("payment-method");
   const paymentMethod = paymentSelect ? paymentSelect.value.trim() : "";
 
-  // Si no hay valor seleccionado → mostrar solo animación visual
+  // Si no hay valor seleccionado → mostrar animación visual
   if (!paymentMethod) {
     paymentSelect.classList.add("shake-error");
     paymentSelect.style.borderColor = "#e53e3e";
@@ -897,10 +898,11 @@ function checkout() {
     }, 1000);
 
     paymentSelect.focus();
-
     return;
   }
 
+  // 💾 Guardar el método de pago seleccionado
+  localStorage.setItem("metodoPago", paymentMethod);
 
   // ✅ Abrir modal de tipo de entrega
   openDeliveryModal();
@@ -941,6 +943,11 @@ function selectDeliveryType(type) {
   const cartTotal = localStorage.getItem("cartTotal") || 0;
   console.log("🧾 Total cargado desde localStorage:", cartTotal);
 
+  // Guardar observaciones si existen
+  const observaciones = document.getElementById("cart-notes")?.value.trim() || "";
+  localStorage.setItem("cartObservaciones", observaciones);
+
+
   if (type === "Recoger en tienda" || type === "Mesa") {
     openCustomerModal(type);
   } else if (type === "Domicilio") {
@@ -948,8 +955,41 @@ function selectDeliveryType(type) {
     window.location.href = "domicilio.html";
   }
 
-  console.log(`Pedido preparado (${type}), pendiente de envío final.`);
 }
+
+
+// ================================
+// ✅ VALIDACIONES DEL FORMULARIO DEL CLIENTE
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+  const nameInput = document.getElementById("customer-name");
+  const phoneInput = document.getElementById("customer-phone");
+  const mesaInput = document.getElementById("customer-mesa");
+
+  // 🧍 Solo letras y espacios en el nombre
+  nameInput.addEventListener("input", () => {
+    nameInput.value = nameInput.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+  });
+
+  // 📞 Solo números y un solo +
+  phoneInput.addEventListener("input", () => {
+    // Permite un + solo al inicio y luego solo dígitos
+    phoneInput.value = phoneInput.value
+      .replace(/[^\d+]/g, "") // Elimina cualquier carácter que no sea número o +
+      .replace(/(?!^)\+/g, ""); // Elimina cualquier + que no esté al inicio
+  });
+
+  // 🍽️ Solo números en número de mesa
+  if (mesaInput) {
+    mesaInput.addEventListener("input", () => {
+      mesaInput.value = mesaInput.value.replace(/\D/g, "");
+    });
+  }
+});
+
+
+
+
 
 // ==========================================
 // 🧍 MODAL DE DATOS DEL CLIENTE
@@ -1051,6 +1091,8 @@ const pedido = {
 
 // 🚀 Enviar pedido a WhatsApp
 enviarPedidoWhatsApp(pedido);
+enviarPedidoASheets(pedido);
+
 
 // 🧹 Limpiar carrito y cerrar modal
 cart = [];

@@ -2,101 +2,99 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Domicilio | Mr. George</title>
-    <link rel="icon" type="image/png" href="img/icono_tienda.png">
-      <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domicilio | Mr. George</title>
+  <link rel="icon" type="image/png" href="img/icono_tienda.png">
+  <link rel="stylesheet" href="style.css">
 
-    <!-- Leaflet -->
+  <!-- Leaflet -->
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 
 <body>
-    <!-- 🗺️ Mapa -->
-    <div id="map"></div>
+  <!-- 🗺️ Mapa -->
+  <div id="map"></div>
 
-    <!-- 🌫️ Controles flotantes -->
-    <div class="overlay">
-        <!-- 🔙 Botón de ir atrás dentro del overlay -->
-        <button class="btn-back" onclick="window.location.href='index.html'"">
+  <!-- 🌫️ Controles flotantes -->
+  <div class="overlay">
+    <!-- 🔙 Botón de ir atrás dentro del overlay -->
+    <button class="btn-back" onclick="window.location.href='index.html'"">
       <img src=" iconos/back.png" alt="Atrás" />
-        </button>
+    </button>
 
-        <div class="input-container">
-            <input type="text" id="buscar" placeholder="🔍 Buscar dirección o barrio..." />
-            <span class="clear-btn" id="clearBuscar">✖</span>
-        </div>
-
-        <div id="suggestions" class="suggestions"></div>
-
-        <div class="input-container">
-            <input type="text" id="referencia" placeholder="📍 Punto de referencia (opcional)" />
-            <span class="clear-btn" id="clearReferencia">✖</span>
-        </div>
+    <div class="input-container">
+      <input type="text" id="buscar" placeholder="🔍 Buscar dirección o barrio..." />
+      <span class="clear-btn" id="clearBuscar">✖</span>
     </div>
 
-<!-- Panel de totales -->
-<div class="panel" id="panel-totales">
+    <div id="suggestions" class="suggestions"></div>
+
+    <div class="input-container">
+      <input type="text" id="referencia" placeholder="📍 Punto de referencia (opcional)" />
+      <span class="clear-btn" id="clearReferencia">✖</span>
+    </div>
+  </div>
+
+  <!-- Panel de totales -->
+  <div class="panel" id="panel-totales">
     <button id="btn-ubicacion" class="locate-btn" title="Usar ubicación actual">
-        <img src="iconos/norte.png" alt="Ubicación" />
+      <img src="iconos/norte.png" alt="Ubicación" />
     </button>
 
     <div class="linea">
-        <span id="subtotal-label">Subtotal productos:</span>
-        <span id="subtotal">$0</span>
+      <span id="subtotal-label">Subtotal productos:</span>
+      <span id="subtotal">$0</span>
     </div>
     <div class="linea">
-        <span id="domicilio-label">Costo domicilio:</span>
-        <span id="domicilio-cost">Pendiente</span>
+      <span id="domicilio-label">Costo domicilio:</span>
+      <span id="domicilio-cost">Pendiente</span>
     </div>
     <div class="linea" id="recargo-nocturno" style="color: #d84315; font-size: 14px; display: none;">
-        ⚠️ A partir de las 10:00 PM el domicilio aumenta un 40% por recargo nocturno
+      ⚠️ A partir de las 10:00 PM el domicilio aumenta un 40% por recargo nocturno
     </div>
 
     <div class="linea total">
-        <span>Total a pagar:</span>
-        <span id="total">$0</span>
+      <span>Total a pagar:</span>
+      <span id="total">$0</span>
     </div>
     <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar pedido</button>
-</div>
-
-
-  
-<!-- 🧾 Modal de datos del cliente -->
-<div class="customer-modal" id="customer-modal">
-  <div class="customer-content">
-    <h3 id="customer-modal-title">Domicilio</h3>
-    <p class="customer-subtitle">
-      Estás a un paso de confirmar tu pedido<br>
-      Solo ingresa estos datos y ¡listo!
-    </p>
-
-    <form id="customer-form" novalidate>
-      <input 
-        type="text" 
-        id="customer-name" 
-        placeholder="👤 Nombre completo" 
-        required 
-        minlength="3"
-        pattern="^[a-zA-ZÀ-ÿ\s]{3,50}$"
-      >
-
-      <input 
-        type="tel" 
-        id="customer-phone" 
-        placeholder="📞 Ejemplo: +573022666530" 
-        required 
-        pattern="^\+?[0-9\s]{7,}$"
-      >
-
-      <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
-    </form>
-
-    <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
   </div>
-</div>
+
+
+
+  <!-- 🧾 Modal de datos del cliente -->
+  <div class="customer-modal" id="customer-modal">
+    <div class="customer-content">
+      <h3 id="customer-modal-title">Domicilio</h3>
+      <p class="customer-subtitle">
+        Estás a un paso de confirmar tu pedido<br>
+        Solo ingresa estos datos y ¡listo!
+      </p>
+      <form id="customer-form">
+        <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
+        <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
+        <div id="mesa-field" style="display:none;">
+          <input type="text" id="customer-mesa" placeholder="🍽️ Número de mesa">
+        </div>
+
+        <!-- ⚠️ Nuevo texto de aviso -->
+      <p style="
+        text-align:center;
+        color:#868686;
+        font-size:14px;
+        margin:12px 0 8px;
+        ">
+        Por favor verifica tus datos antes de enviar
+      </p>
+
+        <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
+      </form>
+
+      <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
+    </div>
+  </div>
 
 
 
@@ -105,46 +103,48 @@
 
 
 
-    <!-- Scripts -->
-    <script>
-        document.getElementById("clearBuscar").addEventListener("click", () => {
-            document.getElementById("buscar").value = "";
-            document.getElementById("buscar").focus();
-        });
+  <!-- Scripts -->
+  <script>
+    document.getElementById("clearBuscar").addEventListener("click", () => {
+      document.getElementById("buscar").value = "";
+      document.getElementById("buscar").focus();
+    });
 
-        document.getElementById("clearReferencia").addEventListener("click", () => {
-            document.getElementById("referencia").value = "";
-            document.getElementById("referencia").focus();
-        });
-    </script>
+    document.getElementById("clearReferencia").addEventListener("click", () => {
+      document.getElementById("referencia").value = "";
+      document.getElementById("referencia").focus();
+    });
+  </script>
 
 
   <script>
-  // Evitar doble-tap zoom
-  (function () {
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) event.preventDefault();
-      lastTouchEnd = now;
+    // Evitar doble-tap zoom
+    (function () {
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) event.preventDefault();
+        lastTouchEnd = now;
+      }, { passive: false });
+    })();
+
+    // Evitar gesto de zoom con pinza
+    document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+
+    // Bloquear zoom con dos dedos (Android / navegadores modernos)
+    document.addEventListener('touchmove', function (e) {
+      if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
-  })();
+  </script>
 
-  // Evitar gesto de zoom con pinza
-  document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
-  document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.min.js"></script>
 
-  // Bloquear zoom con dos dedos (Android / navegadores modernos)
-  document.addEventListener('touchmove', function (e) {
-    if (e.touches.length > 1) e.preventDefault();
-  }, { passive: false });
-</script>
+  <script src="enviar-whatsapp.js"></script>
+  <script src="domicilio.js"></script>
+  <script src="enviar-sheets.js"></script>
 
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.min.js"></script>
-
-    <script src="enviar-whatsapp.js"></script>
-    <script src="domicilio.js"></script>
 </body>
 
 </html>

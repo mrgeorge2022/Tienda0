@@ -28,7 +28,7 @@ function enviarPedidoWhatsApp(pedido) {
 
   // 🧾 CABECERA
   let msg = `*${tipoEntrega.toUpperCase()}*\n\n`;
-  msg += `*FACTURA Nº:* ${factura}\n\n`;
+  msg += `*FACTURA Nº:* ${(factura || "").toUpperCase()}\n\n`;
   msg += `*FECHA:* ${fecha}\n`;
   msg += `*HORA:* ${hora}\n\n`;
 
@@ -112,6 +112,7 @@ function mostrarModalFactura() {
 
   modal.innerHTML = `
     <div style="
+      position: relative;
       background:#fff;
       border-radius:12px;
       padding:20px;
@@ -120,6 +121,17 @@ function mostrarModalFactura() {
       font-family:Arial,sans-serif;
       box-shadow:0 4px 10px rgba(0,0,0,0.3);
       animation:fadeIn .3s ease;">
+      
+      <!-- 🩶 Botón de cerrar -->
+      <span id="cerrar-modal" style="
+        position:absolute;
+        top:8px;
+        right:12px;
+        font-size:20px;
+        font-weight:bold;
+        color:#999;
+        cursor:pointer;">&times;</span>
+
       <h3 style="margin-bottom:12px;color:#222">✅ Pedido enviado</h3>
       <p style="font-size:14px;color:#555;margin-bottom:20px">
         ¿Deseas imprimir la factura o volver al inicio?
@@ -147,17 +159,21 @@ function mostrarModalFactura() {
 
   document.body.appendChild(modal);
 
-  // Acción: imprimir factura
+  // ❌ Cerrar modal al hacer clic en la X
+  modal.querySelector("#cerrar-modal").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  // 🖨️ Acción: imprimir factura
   modal.querySelector("#btn-factura").addEventListener("click", () => {
     window.open("factura.html", "_blank");
     modal.remove();
   });
 
-  // Acción: volver al inicio y limpiar todo
+  // 🏠 Acción: volver al inicio y limpiar todo
   modal.querySelector("#btn-inicio").addEventListener("click", () => {
     modal.remove();
 
-    // 🧹 Limpiar completamente el localStorage y sessionStorage
     try {
       localStorage.clear();
       sessionStorage.clear();
@@ -166,7 +182,7 @@ function mostrarModalFactura() {
       console.warn("⚠️ Error al limpiar localStorage:", e);
     }
 
-    // 🔄 Redirigir al inicio
     window.location.href = "index.html";
   });
 }
+

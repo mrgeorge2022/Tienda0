@@ -1,8 +1,4 @@
 
-
-
-
-
 // ================================
 // 🗺️ MAPA LEAFLET - DOMICILIO CON RUTA, COSTO Y BUSCADOR INTELIGENTE + BARRIOS PREDEFINIDOS
 // ================================
@@ -401,6 +397,41 @@ function redondearACien(valor) {
   return Math.ceil(valor / 100) * 100;
 }
 
+
+
+
+// ================================
+// ✅ VALIDACIONES DEL FORMULARIO DEL CLIENTE
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+  const nameInput = document.getElementById("customer-name");
+  const phoneInput = document.getElementById("customer-phone");
+  const mesaInput = document.getElementById("customer-mesa");
+
+  // 🧍 Solo letras y espacios en el nombre
+  nameInput.addEventListener("input", () => {
+    nameInput.value = nameInput.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+  });
+
+  // 📞 Solo números y un solo +
+  phoneInput.addEventListener("input", () => {
+    // Permite un + solo al inicio y luego solo dígitos
+    phoneInput.value = phoneInput.value
+      .replace(/[^\d+]/g, "") // Elimina cualquier carácter que no sea número o +
+      .replace(/(?!^)\+/g, ""); // Elimina cualquier + que no esté al inicio
+  });
+
+  // 🍽️ Solo números en número de mesa
+  if (mesaInput) {
+    mesaInput.addEventListener("input", () => {
+      mesaInput.value = mesaInput.value.replace(/\D/g, "");
+    });
+  }
+});
+
+
+
+
 // ================================
 // 🧾 FINALIZAR PEDIDO (SIEMPRE PIDE DATOS) Y ENVIAR A WHATSAPP
 // ================================
@@ -445,8 +476,8 @@ function finalizarPedido() {
 function enviarPedidoDomicilio(nombre, telefono) {
   const direccion = document.getElementById("buscar").value.trim();
   const referencia = document.getElementById("referencia").value.trim();
-  const metodoPago = document.getElementById("metodo-pago")?.value || "No especificado";
-  const observaciones = document.getElementById("observaciones")?.value || "";
+  const metodoPago = localStorage.getItem("metodoPago") || "No especificado";
+  const observaciones = localStorage.getItem("cartObservaciones") || "";
   const { lat, lng } = markerUsuario.getLatLng();
 
   const carrito = JSON.parse(localStorage.getItem("cart")) || [];
@@ -454,6 +485,8 @@ function enviarPedidoDomicilio(nombre, telefono) {
   const totalPagar = subtotal + costoDomicilio;
   const propina = Math.round(totalPagar * 0.1);
   const totalConPropina = totalPagar + propina;
+
+  
 
   // Generar factura
   const factura = generarFacturaId(nombre, telefono);
@@ -483,6 +516,8 @@ function enviarPedidoDomicilio(nombre, telefono) {
   };
 
   enviarPedidoWhatsApp(pedido);
+  enviarPedidoASheets(pedido);
+
 }
 
 // ================================
