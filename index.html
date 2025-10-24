@@ -408,6 +408,26 @@
       </div>
   </footer>
 
+  <script>
+  // Evitar doble-tap zoom
+  (function () {
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) event.preventDefault();
+      lastTouchEnd = now;
+    }, { passive: false });
+  })();
+
+  // Evitar gesto de zoom con pinza
+  document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+  document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+
+  // Bloquear zoom con dos dedos (Android / navegadores modernos)
+  document.addEventListener('touchmove', function (e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+</script>
 
   <script src="horario.js"></script>
   <script src="productos-variable.js"></script>
