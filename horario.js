@@ -117,7 +117,7 @@ function formatTime({ h, m }) {
 function setOpen(title, subtitle = "") {
   const header = document.getElementById("status-header");
   const sub = document.getElementById("status-subtext");
-  header.style.background = "#2ecc71";
+  header.style.background = "#27ae27";
   header.style.color = "#fff";
   header.textContent = title;
   sub.textContent = subtitle;

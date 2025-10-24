@@ -507,8 +507,10 @@ function updateQuantityButtons() {
 function updateAddToCartButton() {
   if (!currentProduct) return;
   const total = parseFloat(currentProduct.precio) * modalQuantity;
-  const button = document.getElementById("add-to-cart-modal");
-  button.innerHTML = `Agregar ${formatPrice(total)}`;
+
+  // Actualizamos solo el precio al lado del botón
+  const priceSpan = document.getElementById("modal-add-price");
+  priceSpan.textContent = formatPrice(total);
 }
 
 
@@ -763,7 +765,7 @@ function renderCartItems() {
 
   if (cart.length === 0) {
     cartItemsEl.innerHTML =
-      '<p style="text-align: center; color: #718096; padding: 20px;">Tu carrito está vacío</p>';
+      '<p style="text-align: center; color: var(--muted); padding: 20px;">Tu carrito está vacío</p>';
     return;
   }
 

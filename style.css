@@ -1,23 +1,33 @@
 :root {
+
+    --bg-body: linear-gradient(135deg, #FFD700, #000000);
+    /* amarillo a negro */
+
+
     /* Fondo principal */
-    --bg-start: #f5f7fa;
+    --bg-start: #333;
     /* blanco grisáceo */
-    --bg-end: #e2e8f0;
+    --bg-end: #444;
     /* gris claro */
 
     /* Tarjetas y modales */
-    --card-bg: #ffffff;
+    --card-bg: #222;
     /* blanco puro para tarjetas */
 
     /* Texto y elementos secundarios */
-    --muted: #535353;
+    --muted: #c4c4c4;
     /* gris medio para texto secundario */
 
+    --mutedquantitybtn: #7272724f;
+    /* color original */
+
+
     /* Colores de acento */
-    --primary-1: #f6c90e;
+    --primary-1: #ffc400;
     /* amarillo cálido */
     --primary-2: #e0b800;
     /* amarillo más oscuro para gradiente */
+    --primary-3: #b19000;
 
     --accent: linear-gradient(45deg, var(--primary-1) 0%, var(--primary-2) 100%);
 
@@ -26,21 +36,25 @@
     --soft-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 
     /* Texto principal */
-    --text-color: #2d3748;
+    --text-color: #fff;
     /* gris oscuro para legibilidad */
+
+
+    --textarea: #444;
+
+    --quantitymodaltext: #444;
 }
 
 
 
-  /* Evitar zoom en inputs de iOS */
-  input, textarea, select, button {
-    font-size: 16px !important;
-  }
-  html, body {
+
+html,
+body {
     touch-action: manipulation;
     -ms-touch-action: manipulation;
     overscroll-behavior: contain;
-  }
+}
+
 /*//////////////////////////////*/
 
 
@@ -58,29 +72,21 @@ html {
     scroll-behavior: smooth;
 }
 
+
 /* Fondo y estilo básico del body */
-/* 🪶 Fondo elegante con degradado + imagen */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
-    background:
-        var(--bg-start, #f5f7fa);
+
+    /* aplicamos el gradient del root */
+    background: var(--bg-body);
     background-attachment: fixed;
-    /* opcional: efecto parallax suave */
+    /* efecto parallax suave */
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
 }
 
-/* Capa superior semitransparente (para brillo o mezcla ligera) */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.25);
-    pointer-events: none;
-    z-index: 0;
-}
 
 
 /* =========================================
@@ -174,7 +180,7 @@ body::before {
 .header-info h1 {
     font-size: 1.9rem;
     font-weight: 700;
-    color: #222;
+    color: var(--text-color);
     margin: 0;
     line-height: 1.1;
 }
@@ -203,7 +209,7 @@ body::before {
 /* Subtexto */
 #status-subtext {
     font-size: 0.85rem;
-    color: rgba(60, 60, 60, 0.85);
+    color: #ffffff;
     text-align: center;
     font-weight: 400;
 }
@@ -214,9 +220,8 @@ body::before {
 
 /* ---------- ESTADOS ---------- */
 #status-header.open {
-    background-color: #28a745;
+    background-color: #27ae27;
     color: #fff;
-    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
 }
 
 #status-header.closed {
@@ -365,7 +370,7 @@ body::before {
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-    color: #4a5568;
+    color: var(--text-color);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -414,8 +419,11 @@ body::before {
     height: 80px;
     border-radius: 15px;
     flex-shrink: 0;
-    background: #f2f2f2;
-    background-image: linear-gradient(90deg, #f2f2f2 25%, #e8e8e8 50%, #f2f2f2 75%);
+    background: var(--bg-end);
+    background-image: linear-gradient(90deg,
+            var(--bg-start) 25%,
+            var(--bg-end) 50%,
+            var(--bg-start) 75%);
     background-size: 400% 100%;
     animation: skeleton-shimmer 0.4s ease-in-out infinite;
 }
@@ -431,8 +439,11 @@ body::before {
 /* Barras individuales para simular texto */
 .skeleton-line {
     border-radius: 6px;
-    background: #f2f2f2;
-    background-image: linear-gradient(90deg, #f2f2f2 25%, #e8e8e8 50%, #f2f2f2 75%);
+    background: var(--bg-end);
+    background-image: linear-gradient(90deg,
+            var(--bg-start) 25%,
+            var(--bg-end) 50%,
+            var(--bg-start) 75%);
     background-size: 400% 100%;
     animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }
@@ -522,7 +533,7 @@ body::before {
 
 .product-card.inactive {
     opacity: 0.6;
-    background: #f7fafc;
+    background: var(--card-bg);
 }
 
 .product-image {
@@ -617,14 +628,13 @@ body::before {
 }
 
 .add-button img.add-icon {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 .add-button:hover {
     transform: translate(35%, 35%) scale(1.06);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35), 0 4px 10px rgba(0, 0, 0, 0.14);
 }
 
 .add-button.inactive {
@@ -686,13 +696,13 @@ body::before {
     border-radius: 60px;
     cursor: pointer;
     z-index: 1000;
-    padding: 10px;
+    padding: 20px;
     overflow: hidden;
     width: auto;
     height: 70px;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 25px var(--primary-2);
     transition: all 0.3s ease;
 }
 
@@ -794,11 +804,12 @@ body::before {
 
 .product-modal-header {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: left;
+    flex-direction: row; /* ahora en fila */
+    justify-content: space-between; /* separa izquierda y derecha */
+    align-items: center; /* centra verticalmente */
     padding: 0px 30px;
 }
+
 
 .product-modal-title {
     font-size: 25px;
@@ -807,19 +818,21 @@ body::before {
 }
 
 .close-product-modal {
-  position: absolute;
-  top: 15px;       /* separación desde arriba */
-  right: 15px;     /* separación desde la derecha */
-  background: none;
-  color: white;
-  border: none;
-  font-size: 40px;
-  cursor: pointer;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  line-height: 35px;
-  text-align: center;
+    position: absolute;
+    top: 15px;
+    /* separación desde arriba */
+    right: 15px;
+    /* separación desde la derecha */
+    background: none;
+    color: white;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
 }
 
 .product-modal-image {
@@ -837,7 +850,8 @@ body::before {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 0 0 60px 60px; /* solo inferior derecha e izquierda */
+    border-radius: 0 0 60px 60px;
+    /* solo inferior derecha e izquierda */
 }
 
 
@@ -883,8 +897,6 @@ body::before {
 ================================ */
 #extra-options {
     padding: 0 30px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     margin-top: 15px;
     backdrop-filter: blur(6px);
@@ -915,8 +927,9 @@ body::before {
 }
 
 #extra-options input[type="checkbox"] {
-    accent-color: var(--primary, #00b894);
+    accent-color: var(--primary-2);
     margin-right: 6px;
+    color: var(--text-color);
 }
 
 /* ===============================
@@ -943,34 +956,32 @@ body::before {
 /* Campo de texto */
 .instructions-textarea {
     width: 100%;
-    min-height: 90px;
-    padding: 12px 14px;
-    border: 1.5px solid rgb(196, 196, 196);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-color, #fff);
-    font-size: 0.95rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.4;
+    min-height: 70px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.95rem;
     resize: vertical;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(6px);
+    outline: none;
+    background-color: var(--textarea);
+    transition: all 0.2s ease;
 }
 
 /* Placeholder más tenue */
 .instructions-textarea::placeholder {
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--muted);
 }
 
 /* Efecto al enfocar */
 .instructions-textarea:focus {
-    outline: none;
     border-color: var(--primary-1);
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-color);
 }
 
 .modal-actions {
-    position: absolute; /* Fijo dentro del modal */
+    position: absolute;
+    /* Fijo dentro del modal */
     bottom: 0;
     left: 0;
     right: 0;
@@ -980,9 +991,21 @@ body::before {
     justify-content: space-between;
     align-items: center;
     gap: 20%;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid #616161;
     z-index: 100;
 }
+
+.add-to-cart-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    white-space: nowrap;      /* evita salto de línea */
+    display: inline-block;    /* fuerza que el contenido sea inline */
+    margin-left: 10px;        /* espacio opcional entre botón y precio */
+    vertical-align: middle;   /* alinea con el botón */
+}
+
+
 
 
 .quantity-section {
@@ -993,10 +1016,13 @@ body::before {
 .quantity-control {
     display: flex;
     align-items: center;
+    background-color: var(--primary-1);
+    border-radius: 25px;
+    padding: 5px;
 }
 
 .quantity-btn-modal {
-    background: #e4e4e4;
+    background-color: var(--primary-3);
     border: NONE;
     border-radius: 50%;
     width: 35px;
@@ -1007,13 +1033,12 @@ body::before {
     cursor: pointer;
     font-weight: 700;
     font-size: 20px;
-    color: #565a5f;
+    color: var(--quantitymodaltext);
     transition: all 0.3s ease;
 }
 
 .quantity-btn-modal:hover {
-    background: #b9b9b9;
-    border-color: #cbd5e0;
+    background: var(--primary-2);
 }
 
 .quantity-btn-modal:disabled {
@@ -1024,7 +1049,7 @@ body::before {
 .quantity-display {
     font-size: 20px;
     font-weight: 700;
-    color: var(--muted);
+    color: var(--card-bg);
     min-width: 30px;
     text-align: center;
 }
@@ -1032,7 +1057,7 @@ body::before {
 .add-to-cart-modal-btn {
     width: 100%;
     background: var(--accent);
-    color: white;
+    color: var(--card-bg);
     border: none;
     padding: 10px;
     border-radius: 50px;
@@ -1044,7 +1069,6 @@ body::before {
 
 .add-to-cart-modal-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .add-to-cart-modal-btn:disabled {
@@ -1095,8 +1119,8 @@ body::before {
 
 /* === CONTENIDO DEL CARRITO === */
 .cart-content {
-    background: #ffffff;
-    color: #2d3748;
+    background: var(--card-bg);
+    color: var(--text-color);
     /* gris oscuro */
     width: 100%;
     height: 100%;
@@ -1161,13 +1185,13 @@ body::before {
 .cart-title {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-color);
 }
 
 .close-cart {
     background: none;
     border: none;
-    font-size: 2rem;
+    font-size: 40px;
     cursor: pointer;
     color: #718096;
     transition: transform 0.2s ease, color 0.2s ease;
@@ -1192,7 +1216,7 @@ body::before {
     justify-content: space-between;
     align-items: center;
     padding: 15px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #616161;
     gap: 15px;
 }
 
@@ -1227,25 +1251,24 @@ body::before {
 
 /* === Ícono de eliminar producto === */
 .cart-item-delete {
-  width: 20px;
-  height: 20px;
-  opacity: 0.7;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  filter: brightness(0) saturate(100%) invert(24%) sepia(8%) saturate(800%) hue-rotate(178deg) brightness(92%) contrast(91%);
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .cart-item-delete:hover {
-  transform: scale(1.15);
-  opacity: 0.8;
-  filter: brightness(0) saturate(100%) invert(24%) sepia(90%) saturate(6182%) hue-rotate(350deg) brightness(92%) contrast(85%);
+    transform: scale(1.15);
+    opacity: 0.8;
+    filter: brightness(0) saturate(100%) invert(24%) sepia(90%) saturate(6182%) hue-rotate(350deg) brightness(92%) contrast(85%);
 }
 
 /* === Animación al eliminar producto === */
 .fade-out {
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 
@@ -1260,19 +1283,19 @@ body::before {
 
 .item-name {
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-color);
     margin-bottom: 3px;
 }
 
 .item-instructions {
     font-size: 0.8rem;
-    color: #718096;
+    color: var(--muted);
     font-style: italic;
     margin-bottom: 4px;
 }
 
 .item-price {
-    color: var(--primary-2);
+    color: var(--primary-1);
     font-size: 0.9rem;
     font-weight: 600;
 }
@@ -1285,7 +1308,7 @@ body::before {
 }
 
 .quantity-btn {
-    background: #edf2f7;
+    background: var(--mutedquantitybtn);
     border: none;
     border-radius: 50%;
     width: 30px;
@@ -1297,14 +1320,14 @@ body::before {
 }
 
 .quantity-btn:hover {
-    background: #e2e8f0;
+    background: var(--muted);
 }
 
 .quantity {
     font-weight: 600;
     min-width: 20px;
     text-align: center;
-    color: #2d3748;
+    color: var(--muted);
 }
 
 
@@ -1313,32 +1336,33 @@ body::before {
     margin: 15px 0 0px;
     display: flex;
     flex-direction: column;
+    border-top: 1px solid #616161;
 }
 
 .cart-observations-label {
     font-weight: 600;
     margin-bottom: 8px;
-    color: #2d3748;
+    margin-top: 8px;
+    color: var(--muted);
 }
 
 .cart-observations-textarea {
     width: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 70px;
-    border: 1px solid #e2e8f0;
+    border: none;
     border-radius: 10px;
     padding: 10px;
     font-size: 0.95rem;
     resize: vertical;
     outline: none;
-    background-color: #f8fafc;
-    color: #2d3748;
+    background-color: var(--textarea);
     transition: all 0.2s ease;
 }
 
 .cart-observations-textarea:focus {
     border-color: var(--primary-1);
-    background-color: #fff;
+    color: var(--text-color);
 }
 
 
@@ -1349,7 +1373,7 @@ body::before {
     flex-direction: column;
     gap: 10px;
     padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #616161;
 }
 
 #textmetodo {
@@ -1370,10 +1394,10 @@ body::before {
 /* 💳 Select de método de pago */
 .cart-payment-select {
     width: 40%;
-    padding: 7px ;
+    padding: 7px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 10px;
-    background: var(--card-bg);
+    background: var(--mutedquantitybtn);
     color: var(--text-color);
     font-weight: 500;
     font-size: 0.9rem;
@@ -1393,13 +1417,25 @@ body::before {
 
 /* 🔴 Animación de error para el select método de pago */
 .shake-error {
-  animation: shake 0.4s ease-in-out;
+    animation: shake 0.4s ease-in-out;
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20%,
+    60% {
+        transform: translateX(-6px);
+    }
+
+    40%,
+    80% {
+        transform: translateX(6px);
+    }
 }
 
 
@@ -1407,7 +1443,7 @@ body::before {
 .cart-total-amount {
     font-size: 20px;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-color);
     text-align: right;
 }
 
@@ -1561,7 +1597,7 @@ body::before {
 /* Contenido del modal */
 .delivery-content,
 .customer-content {
-    background: var(--bg-end);
+    background: var(--card-bg);
     padding: 25px 30px;
     border-radius: 20px;
     width: 90%;
@@ -1570,6 +1606,7 @@ body::before {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     transform: translateY(-20px);
     transition: all 0.3s ease;
+    color: var(--text-color);
 }
 
 .delivery-modal.show .delivery-content,
@@ -1591,6 +1628,12 @@ body::before {
 
 
 /* Opciones de entrega */
+.delivery-modal {
+    color: var(--text-color);
+}
+
+
+
 .delivery-options {
     display: flex;
     flex-direction: column;
@@ -1610,7 +1653,7 @@ body::before {
     font-size: 15px;
     font-weight: 600;
     color: var(--muted);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: none;
     border-radius: 45px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1640,13 +1683,14 @@ body::before {
     background: none;
     padding: 6px;
     border-radius: 12px;
-        transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 /* Pequeño zoom al hover */
 .delivery-option-btn:hover img {
     transform: scale(1.5);
 }
+
 /* Texto dentro del botón */
 .delivery-option-btn span {
     flex: 1;
@@ -1674,13 +1718,15 @@ body::before {
 
 /* Inputs del modal de cliente */
 .customer-content input {
+    color: var(--text-color);
     width: 100%;
     margin: 6px 0;
     padding: 12px;
     font-size: 15px;
     border-radius: 25px;
-    border: 1px solid #ccc;
+    border: none;
     transition: border 0.3s ease, box-shadow 0.3s ease;
+    background: var(--bg-end);
 }
 
 .customer-content input:focus {
@@ -1742,6 +1788,8 @@ body::before {
     height: auto;
     transition: transform 0.3s ease;
     cursor: pointer;
+    filter: invert(1);
+    opacity: 0.7;
 }
 
 .footer-socials img:hover {
@@ -1753,11 +1801,13 @@ body::before {
     width: 100px;
     border-radius: 12px;
     margin-bottom: 20px;
+    filter: invert(1);
+    opacity: 0.7;
 }
 
 /* Sedes */
 .footer-branches {
-    color: #2d3748;
+    color: var(--muted);
     font-size: 0.95rem;
     margin-bottom: 25px;
     line-height: 1.5;
@@ -1772,7 +1822,7 @@ body::before {
 .footer-branches .telefono {
     display: inline-block;
     margin-top: 5px;
-    color: #667eea;
+    color: var(--muted);
     font-weight: 600;
 }
 
@@ -1808,7 +1858,9 @@ body::before {
     margin-bottom: 100px;
 }
 
-
+.create-store-btn {
+    color: var(--muted);
+}
 
 
 
@@ -1817,144 +1869,144 @@ body::before {
 /*Domicilios*/
 
 /* 🌍 Mapa a pantalla completa */
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            z-index: 1;
-        }
+#map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
 
-        /* 🌫️ Capa de controles encima */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            padding: 10px 10px 10px 10px;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0) 100%);
-            color: white;
-        }
+/* 🌫️ Capa de controles encima */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 10px 10px 10px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0) 100%);
+    color: white;
+}
 
-        /* 🔙 Botón de ir atrás (dentro del overlay) */
-        .btn-back {
-            align-self: flex-start;
-            background: none;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 25px;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+/* 🔙 Botón de ir atrás (dentro del overlay) */
+.btn-back {
+    align-self: flex-start;
+    background: none;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
 
-        .btn-back img {
-            width: 14px;
-            height: auto;
-        }
+.btn-back img {
+    width: 14px;
+    height: auto;
+}
 
-        /* 🧹 Inputs */
-        .input-container {
-            position: relative;
-            width: 90%;
-            max-width: 500px;
-        }
+/* 🧹 Inputs */
+.input-container {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+}
 
-        .input-container input {
-            width: 100%;
-            padding: 10px 35px 10px 12px;
-            border-radius: 25px;
-            border: none;
-            outline: none;
-            font-size: 15px;
-            backdrop-filter: blur(8px);
-            background: #fff8;
-            color: #333;
-        }
+.input-container input {
+    width: 100%;
+    padding: 10px 35px 10px 12px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    backdrop-filter: blur(8px);
+    background: #fff8;
+    color: #333;
+}
 
-        .clear-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 18px;
-            color: #666;
-            opacity: 0;
-            transition: opacity 0.2s;
-            user-select: none;
-        }
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+    opacity: 0;
+    transition: opacity 0.2s;
+    user-select: none;
+}
 
-        .input-container:hover .clear-btn,
-        .input-container input:not(:placeholder-shown)+.clear-btn {
-            opacity: 1;
-        }
+.input-container:hover .clear-btn,
+.input-container input:not(:placeholder-shown)+.clear-btn {
+    opacity: 1;
+}
 
-        #subtotal,
-        #domicilio-cost {
-            font-weight: bold;
-        }
+#subtotal,
+#domicilio-cost {
+    font-weight: bold;
+}
 
-        /* 📋 Estilo de sugerencias mejorado */
-        .suggestions {
-            position: absolute;
-            top: 106px;
-            width: 85%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 10px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-            display: none;
-            z-index: 1001;
-            max-height: 50vh;
-            /* 🔹 límite de altura visible */
-            overflow-y: auto;
-            /* 🔹 scroll si hay demasiadas sugerencias */
-            padding: 6px;
-            backdrop-filter: blur(6px);
-        }
+/* 📋 Estilo de sugerencias mejorado */
+.suggestions {
+    position: absolute;
+    top: 106px;
+    width: 85%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    display: none;
+    z-index: 1001;
+    max-height: 50vh;
+    /* 🔹 límite de altura visible */
+    overflow-y: auto;
+    /* 🔹 scroll si hay demasiadas sugerencias */
+    padding: 6px;
+    backdrop-filter: blur(6px);
+}
 
-        /* Estilo individual de cada sugerencia */
-        .suggestions div {
-            background: white;
-            border-radius: 8px;
-            margin: 4px 0;
-            padding: 10px 14px;
-            cursor: pointer;
-            font-size: 15px;
-            color: #333;
-            transition: background 0.2s, transform 0.15s;
-        }
+/* Estilo individual de cada sugerencia */
+.suggestions div {
+    background: white;
+    border-radius: 8px;
+    margin: 4px 0;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    transition: background 0.2s, transform 0.15s;
+}
 
-        .suggestions div:hover {
-            background: #ff9800;
-            color: white;
-            transform: scale(1.02);
-        }
+.suggestions div:hover {
+    background: #ff9800;
+    color: white;
+    transform: scale(1.02);
+}
 
-        /* 🔹 Scroll elegante */
-        .suggestions::-webkit-scrollbar {
-            width: 8px;
-        }
+/* 🔹 Scroll elegante */
+.suggestions::-webkit-scrollbar {
+    width: 8px;
+}
 
-        .suggestions::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-        }
+.suggestions::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
 
-        .suggestions::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.45);
-        }
+.suggestions::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.45);
+}
 
 /* Panel fijo abajo */
 .panel {
@@ -1972,7 +2024,8 @@ body::before {
 
 /* Botón de ubicación */
 .locate-btn {
-    position: fixed; /* se moverá con JS */
+    position: fixed;
+    /* se moverá con JS */
     right: 20px;
     z-index: 1000;
     background: var(--accent);
@@ -1999,55 +2052,55 @@ body::before {
 }
 
 
-        .panel .linea {
-            display: flex;
-            justify-content: space-between;
-            margin: 6px 0;
-            font-size: 16px;
-        }
+.panel .linea {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 16px;
+}
 
-        .panel .total {
-            font-weight: bold;
-            font-size: 18px;
-            border-top: 1px solid #ddd;
-            margin-top: 10px;
-            padding-top: 8px;
-        }
-
-
-
-        #linea,
-        #recargo-nocturno {
-            color: #d84315;
-            /* Rojo-alarma */
-            font-size: 14px;
-            font-weight: 500;
-            text-align: center;
-            display: flex;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: none;
-            /* Por defecto oculto; JS lo muestra cuando aplica */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin: 10px 0;
-        }
+.panel .total {
+    font-weight: bold;
+    font-size: 18px;
+    border-top: 1px solid #ddd;
+    margin-top: 10px;
+    padding-top: 8px;
+}
 
 
-        .btn-finalizar {
-            width: 100%;
-            margin-top: 10px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-        }
 
-        .btn-finalizar:hover {
-            background: #43a047;
-        }
+#linea,
+#recargo-nocturno {
+    color: #d84315;
+    /* Rojo-alarma */
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: none;
+    /* Por defecto oculto; JS lo muestra cuando aplica */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+}
 
-        /*//////////////////////////////*
+
+.btn-finalizar {
+    width: 100%;
+    margin-top: 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.btn-finalizar:hover {
+    background: #43a047;
+}
+
+/*//////////////////////////////*

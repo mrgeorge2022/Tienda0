@@ -217,11 +217,23 @@
         </div>
       </div>
 
-      <!-- Nombre del producto -->
       <div class="product-modal-header">
-        <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
-        <div class="modal-price-overlay" id="modal-product-price">$0</div>
+        <!-- Parte izquierda: nombre + precio -->
+        <div class="product-info">
+          <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
+          <div class="modal-price-overlay" id="modal-product-price">$0</div>
+        </div>
+
+        <!-- Parte derecha: incrementadores -->
+        <div class="quantity-section">
+          <div class="quantity-control">
+            <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
+            <span class="quantity-display" id="modal-quantity">1</span>
+            <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
+          </div>
+        </div>
       </div>
+
 
       <!-- Descripción -->
       <div class="product-modal-description" id="modal-product-description">
@@ -238,20 +250,17 @@
       </div>
 
       <!-- Incrementadores y botón fijo abajo -->
-      <div class="modal-actions">
-        <div class="quantity-section">
-          <div class="quantity-control">
-            <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
-            <span class="quantity-display" id="modal-quantity">1</span>
-            <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
-          </div>
-        </div>
+<div class="modal-actions">
+  <!-- Precio dinámico -->
+  <span class="add-to-cart-price" id="modal-add-price">
+    <span class="price-number">0</span>
+  </span>
 
-        <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
-          Agregar al carrito
-        </button>
-      </div>
-
+  <!-- Botón -->
+  <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
+    Agregar
+  </button>
+</div>
     </div>
   </div>
 
