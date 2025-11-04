@@ -93,11 +93,21 @@ if (tipoEntrega.toLowerCase().includes("recoger")) {
 
   msg += `*Envía tu pedido aqui --------->*`;
 
-  // ✅ Número de WhatsApp de la tienda
-  const numeroWhatsApp = "573022666530";
 
-  const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(msg)}`;
-  window.open(url, "_blank");
+
+
+
+  
+
+// ✅ Leer número de WhatsApp para mensajes desde config.json
+fetch("config.json")
+  .then((response) => response.json())
+  .then((config) => {
+    const numeroWhatsApp = config.numeroWhatsAppMensajes;
+    const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+  })
+  .catch((error) => console.error("Error al cargar config.json:", error));
 
 
 

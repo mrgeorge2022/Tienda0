@@ -54,6 +54,7 @@ function renderEditor(config) {
         ${renderInput("logo", config.logo, "Logo principal", "Ruta o URL del logo mostrado en la cabecera.")}
         ${renderInput("footerLogo", config.footerLogo, "Logo del pie de página", "Logo mostrado en el footer.")}
         ${renderInput("footerQR", config.footerQR, "Código QR del footer", "Imagen del código QR en el pie de página.")}
+        ${renderInput("numeroWhatsAppMensajes", config.numeroWhatsAppMensajes, "Número de WhatsApp para mensajes", "Número al cual se enviarán los pedidos de WhatsApp.")}
         ${renderInput("crearTienda", config.crearTienda, "Enlace 'Crear Tienda'", "URL que se abre al pulsar el botón 'Crea tu tienda aquí'.")}
       </div>
     </div>
@@ -319,7 +320,9 @@ function buscarValorOriginal(id) {
     "sede-direccion": originalConfig.sede?.direccion,
     "sede-telefono": originalConfig.sede?.telefono,
     "sede-lat": originalConfig.coordenadasSede?.[0]?.toString(),
-    "sede-lng": originalConfig.coordenadasSede?.[1]?.toString()
+    "sede-lng": originalConfig.coordenadasSede?.[1]?.toString(),
+    "numeroWhatsAppMensajes": originalConfig.numeroWhatsAppMensajes,
+
   };
   return mapa[id] ?? "";
 }
@@ -355,6 +358,8 @@ function collectConfig() {
   cfg.footerLogo = get("footerLogo");
   cfg.footerQR = get("footerQR");
   cfg.crearTienda = get("crearTienda");
+  cfg.numeroWhatsAppMensajes = get("numeroWhatsAppMensajes");
+
 
   // --- Colores
   cfg.colores = {};
