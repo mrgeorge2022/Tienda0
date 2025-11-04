@@ -3,14 +3,32 @@
 // =======================
 
 // URL de tu Google Apps Script
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxE5905w07prM6Om7B972nZilOZOEi_IUgX2Cixf98F9t-U8A9ClVxq5pyRjXAt5Zg/exec";
+let APPS_SCRIPT_URL = "";
+
+// 🧩 Escuchar cuando config.json haya sido cargado
+document.addEventListener("configCargado", (e) => {
+  configTienda = e.detail;
+  if (configTienda?.apiUrls?.productos) {
+    APPS_SCRIPT_URL = configTienda.apiUrls.productos;
+  } else {
+    console.warn("⚠️ No se encontró apiUrls.productos en config.json");
+  }
+});
+
 
 // Variables globales
 let products = [];
 let cart = [];
 let currentProduct = null;
 let modalQuantity = 1;
+let configTienda = null;
+
+// 🧩 Escuchar cuando config.json haya sido cargado
+document.addEventListener("configCargado", (e) => {
+  configTienda = e.detail;
+});
+
+
 
 // DOM Elements
 const skeletonLoadingEl = document.getElementById("skeleton-loading");
@@ -25,11 +43,12 @@ const productModalEl = document.getElementById("product-modal");
  * Inicializa la aplicación cuando el DOM está listo.
  * Actualmente llama a `loadProducts` para cargar los productos desde Google Sheets.
  */
-document.addEventListener("DOMContentLoaded", function () {
-  // 🛒 Cargar productos
-  loadProducts();
+// ===============================================
+// 🚀 INICIALIZAR CUANDO TODO ESTÉ LISTO
+// ===============================================
 
-  // 💾 Restaurar carrito desde localStorage si existe
+document.addEventListener("DOMContentLoaded", () => {
+  // 💾 Restaurar carrito desde localStorage
   const savedCart = localStorage.getItem("cart");
   if (savedCart) {
     try {
@@ -40,6 +59,11 @@ document.addEventListener("DOMContentLoaded", function () {
       cart = [];
     }
   }
+
+  // ⚙️ Esperar a que config.json esté cargado antes de renderizar productos
+  document.addEventListener("configCargado", () => {
+    loadProducts(); // Esta función internamente llama a renderProducts()
+  });
 });
 
 
@@ -223,16 +247,11 @@ function tryParsePossibleJSONP(txt) {
  * para una sección, muestra un mensaje de 'No hay productos'.
  */
 function renderProducts() {
-  const categories = [
-    "almuerzos",
-    "perros",
-    "hamburguesas",
-    "salchipapas",
-    "picadas",
-    "pizzas",
-    "bebidas",
-    "acompanantes",
-  ];
+  // 🧩 Usar las categorías desde config.json si existen
+  const categoriasConfig = configTienda?.categorias?.map(c => c.id.toLowerCase()) || [];
+
+  // Si no hay categorías configuradas, usar un fallback vacío
+  const categories = categoriasConfig.length > 0 ? categoriasConfig : [];
 
   categories.forEach((category) => {
     const grid = document.getElementById(`${category}-grid`);
@@ -251,10 +270,10 @@ function renderProducts() {
 
     if (filteredProducts.length === 0) {
       grid.innerHTML = `
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: #718096;">
-                            No hay productos en esta sección
-                        </div>
-                    `;
+        <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: #718096;">
+          No hay productos en esta sección
+        </div>
+      `;
       return;
     }
 
@@ -264,6 +283,7 @@ function renderProducts() {
     });
   });
 }
+
 
 // Create product card element
 /**
@@ -349,7 +369,16 @@ function createProductCard(product) {
  * @returns {string} emoji
  */
 function getCategoryEmoji(categoria) {
-  const emojis = {
+  // Primero intenta encontrar el emoji en config.json
+  if (configTienda?.categorias) {
+    const match = configTienda.categorias.find(
+      c => c.id.toLowerCase() === categoria.toLowerCase()
+    );
+    if (match && match.emoji) return match.emoji;
+  }
+
+  // Si no está en config.json, usar fallback
+  const emojisFallback = {
     recomendados: "⭐",
     almuerzos: "🍛",
     perros: "🌭",
@@ -360,8 +389,9 @@ function getCategoryEmoji(categoria) {
     bebidas: "🥤",
     acompañantes: "🍚",
   };
-  return emojis[categoria.toLowerCase()] || "🍽️";
+  return emojisFallback[categoria.toLowerCase()] || "🍽️";
 }
+
 
 // Format price in Colombian pesos
 /**
@@ -448,6 +478,9 @@ function openProductModal(product) {
   // ✅ Mostrar modal y actualizar botón con precio base
   productModalEl.classList.add("show");
   updateAddToCartButton();
+
+    // 🚫 Bloquear scroll general del body
+  document.body.style.overflow = "hidden";
 }
 
 
@@ -460,6 +493,9 @@ function closeProductModal() {
   productModalEl.classList.remove("show");
   currentProduct = null;
   modalQuantity = 1;
+
+    // ✅ Restaurar scroll general del body
+  document.body.style.overflow = "";
 }
 
 /**
@@ -733,6 +769,10 @@ function openCart() {
   void cartContent.offsetWidth; // forzar reflow
   cartContent.style.animation = "slideInCart 0.4s ease forwards";
 
+// 🚫 Bloquear scroll general del body
+document.body.style.overflow = "hidden";
+
+
   renderCartItems();
 }
 
@@ -750,6 +790,10 @@ function closeCart() {
     cartModal.style.display = "none";
     cartModal.classList.remove("hide");
     cartContent.style.animation = "";
+
+    // ✅ Restaurar scroll general
+    document.body.style.overflow = "";
+
   }, 400);
 }
 
@@ -762,12 +806,19 @@ function closeCart() {
  */
 function renderCartItems() {
   const cartItemsEl = document.getElementById("cart-items");
+if (cart.length === 0) {
+  cartItemsEl.innerHTML = `
+    <div class="cart-empty">
+      <p class="cart-empty-text">Tu carrito está vacío</p>
+      <button class="btn-add-products" onclick="closeCart(); window.scrollTo({ top: 0, behavior: 'smooth' });">
+        Añadir productos
+      </button>
+    </div>
+  `;
+  return;
+}
 
-  if (cart.length === 0) {
-    cartItemsEl.innerHTML =
-      '<p style="text-align: center; color: var(--muted); padding: 20px;">Tu carrito está vacío</p>';
-    return;
-  }
+
 
   cartItemsEl.innerHTML = cart
     .map((item, index) => {
@@ -1131,8 +1182,8 @@ function scrollToSection(sectionId) {
 
   // Actualizar el botón activo
   buttons.forEach((btn) => btn.classList.remove("active"));
-  const clickedButton = Array.from(buttons).find((btn) =>
-    btn.getAttribute("onclick")?.includes(sectionId)
+  const clickedButton = Array.from(buttons).find(
+    (btn) => btn.dataset.target === sectionId
   );
   if (clickedButton) clickedButton.classList.add("active");
 
@@ -1176,8 +1227,8 @@ window.addEventListener("scroll", () => {
 
   // Actualizar el botón activo
   buttons.forEach((btn) => btn.classList.remove("active"));
-  const activeBtn = Array.from(buttons).find((btn) =>
-    btn.getAttribute("onclick")?.includes(current)
+  const activeBtn = Array.from(buttons).find(
+    (btn) => btn.dataset.target === current
   );
   if (activeBtn) {
     activeBtn.classList.add("active");
@@ -1202,6 +1253,7 @@ window.addEventListener("scroll", () => {
     }
   }
 });
+
 
 // ==================================================
 // 🔹 UTILIDADES DE ESTADO (loading / error)

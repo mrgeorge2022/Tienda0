@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cargando...</title>
+  <link id="favicon" rel="icon" type="image/png" href="">
+  <style>
+    :root {
+      --bg-body: linear-gradient(135deg, #fafafa, #eceff1);
+      --card-bg: #ffffff;
+      --muted: #616161;
+      --text-color: #212121;
+      --textarea: #f9f9f9;
+      --soft-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --glass-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+      /* Colores por tipo */
+      --color-domicilio: #ff7043;
+      --color-mesa: #29b6f6;
+      --color-recoger: #66bb6a;
+    }
+
+    /* ===== RESET ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-color);
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    /* ===== ENCABEZADO ===== */
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .header img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-color);
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.6rem; }
+      .header img { width: 36px; height: 36px; }
+    }
+    /* ===== FECHA Y BOTÓN ===== */
+    .fecha-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+    }
+
+    #fechabtn {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      max-width: 350px;
+
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--muted);
+      margin-right: 0.5rem;
+    }
+
+    input[type="date"] {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 0.5rem 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #c9c9c9;
+      border-radius: 8px;
+      background: var(--textarea);
+      transition: all 0.2s ease;
+      outline: none;
+      color: var(--text-color);
+    }
+
+    input[type="date"]:focus {
+      border-color: var(--color-mesa);
+      box-shadow: 0 0 0 3px rgba(41, 182, 246, 0.25);
+    }
+
+
+    /* ===== BOTÓN RECARGAR ===== */
+    #btn-recargar {
+      background: linear-gradient(45deg, var(--color-mesa), #4fc3f7);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 0.6rem 1.3rem;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: var(--soft-shadow);
+      font-size: 1rem;
+      transition: all 0.25s ease;
+    }
+
+    #btn-recargar:active {
+      transform: scale(0.97);
+    }
+
+    /* ===== LISTA HORIZONTAL DE PEDIDOS ===== */
+    #lista-pedidos {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    #lista-pedidos::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    #lista-pedidos::-webkit-scrollbar-track {
+      background: #e0e0e0;
+      border-radius: 10px;
+    }
+
+    #lista-pedidos::-webkit-scrollbar-thumb {
+      background: var(--text-color);
+      border-radius: 10px;
+    }
+
+    #lista-pedidos::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+
+    /* ===== PEDIDO ===== */
+    .pedido {
+      flex: 0 0 auto;
+      width: 320px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      box-shadow: var(--soft-shadow);
+      border-left: 6px solid var(--text-color);
+      overflow-wrap: break-word;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+
+    /* ===== TIPO DE ENTREGA ===== */
+    .tipo-entrega {
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 700;
+      padding: 0.45rem 1rem;
+      display: inline-block;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: var(--soft-shadow);
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .tipo-entrega.domicilio {
+      background: linear-gradient(45deg, #ff7043, #ff8a65);
+    }
+
+    .tipo-entrega.mesa {
+      background: linear-gradient(45deg, #29b6f6, #4fc3f7);
+    }
+
+    .tipo-entrega.recoger {
+      background: linear-gradient(45deg, #66bb6a, #81c784);
+    }
+
+    /* ===== BORDES SEGÚN TIPO ===== */
+    .pedido.domicilio {
+      border-left: 6px solid var(--color-domicilio);
+    }
+
+    .pedido.mesa {
+      border-left: 6px solid var(--color-mesa);
+    }
+
+    .pedido.recoger {
+      border-left: 6px solid var(--color-recoger);
+    }
+
+    /* ===== ENCABEZADO DE CADA PEDIDO ===== */
+    .pedido-header {
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .pedido-datos {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pedido-numero strong {
+      color: #283593;
+      /* Azul fuerte */
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .pedido-hora {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* ===== CONTENIDO ===== */
+    .pedido strong {
+      color: var(--muted);
+    }
+
+    .productos {
+      padding: 5px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-top: 0.6rem;
+    }
+
+    .pedido small {
+      display: block;
+      color: var(--muted);
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    /* Producto individual */
+    .producto-item {
+      display: flex;
+      align-items: center;
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .producto-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Contenedor de cantidad + detalle */
+    .cantidadproducto {
+      display: flex;
+      align-items: center;
+      padding: 0.3rem 0;
+      /* espacio entre productos */
+      border-bottom: 1px solid #e0e0e0;
+      gap: 0.6rem;
+      /* separación entre cantidad y detalle */
+    }
+
+    /* Cantidad del producto */
+    .producto-cantidad {
+      font-weight: 700;
+      font-size: 30px;
+      /* más grande */
+      min-width: 35px;
+      /* ancho fijo */
+      text-align: center;
+      color: var(--text-color);
+      flex-shrink: 0;
+      /* no se reduce */
+      border-right: 1px solid #e0e0e0;
+    }
+
+    /* Detalle del producto */
+    .producto-detalle {
+      font-size: 0.95rem;
+      font-weight: bold;
+      word-break: break-word;
+      white-space: normal;
+      /* permite salto de línea */
+      overflow-wrap: anywhere;
+      /* ajusta palabras largas */
+      flex: 1;
+      /* ocupa todo el espacio restante */
+    }
+
+
+
+    /* ===== DATOS COLOREADOS ===== */
+    .pedido-cliente span {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .pedido-direccion span {
+      color: var(--muted);
+    }
+
+    .pedido-mesa span {
+      color: var(--muted);
+    }
+
+    .pedido-observaciones span {
+      color: #d32f2f;
+      font-weight: 600;
+    }
+
+    /* ===== OBSERVACIONES ===== */
+    .observaciones {
+      margin-top: 10px;
+      color: #c62828;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: #ffebee;
+      padding: 0.5rem 0.6rem;
+      border-radius: 6px;
+      border-left: 4px solid #d32f2f;
+    }
+
+    /* ===== SIN PEDIDOS ===== */
+    p {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1rem;
+      margin-top: 1.5rem;
+      font-style: italic;
+    }
+
+    /* ===== ANIMACIONES ===== */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .fecha-container {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      #btn-recargar {
+        width: 100%;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+    #resumen-pedidos {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-radius: 10px;
+      padding: 0.6rem;
+      margin: 0 auto 1rem auto;
+      /* 🔹 centra horizontalmente */
+      position: sticky;
+      top: 70px;
+      z-index: 10;
+      max-width: 400px;
+      left: 0;
+      right: 0;
+    }
+
+    .resumen-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .resumen-circulo {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color);
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- 🧑‍🍳 Encabezado con logo y título -->
+  <div class="header">
+    <img id="logoCocina" src="" alt="Logo restaurante">
+    <h1>Panel de cocina</h1>
+  </div>
+
+  <div class="fecha-container">
+    <div id="fechabtn">
+      <input type="date" id="fecha">
+      <button id="btn-recargar">🔄</button>
+    </div>
+  </div>
+
+  <div id="resumen-pedidos" class="resumen-pedidos"></div>
+  <div id="lista-pedidos">Cargando pedidos...</div>
+
+  <script>
+    // ================================
+    // 🧩 Cargar nombre, logo y favicon desde config.json
+    // ================================
+    fetch("config.json")
+      .then(res => res.json())
+      .then(config => {
+        // 🏷️ Cambiar título de pestaña
+        document.title = `Cocina | ${config.nombreRestaurante || "Mi Restaurante"}`;
+
+        // 🖼️ Cambiar favicon
+        const favicon = document.getElementById("favicon");
+        if (favicon) {
+          favicon.href = config.favicon || config.logoHeader || config.logo || "img/icono_tienda.png";
+        }
+
+        // 🍽️ Colocar logo en el encabezado
+        const logoCocina = document.getElementById("logoCocina");
+        if (logoCocina) {
+          logoCocina.src = config.logoHeader || config.logo || "img/icono_tienda.png";
+        }
+      })
+      .catch(err => console.warn("No se pudo cargar config.json:", err));
+  </script>
+
+  <script src="cocina.js"></script>
+  <script>
+    document.getElementById("btn-recargar").addEventListener("click", () => {
+      location.reload();
+    });
+  </script>
+</body>
+</html>

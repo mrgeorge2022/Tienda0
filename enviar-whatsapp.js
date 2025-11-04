@@ -43,6 +43,11 @@ function enviarPedidoWhatsApp(pedido) {
     msg += `*PUNTO DE REFERENCIA:* ${referencia || "Sin referencia"}\n\n`;
   }
 
+  // ✅ Agregar número de mesa si es tipo "Mesa"
+if (tipoEntrega === "Mesa") {
+msg += `*MESA:* ${pedido.cliente.mesa || "Sin número de mesa"}\n\n`;
+}
+
   // 🛒 PRODUCTOS
   msg += `*PRODUCTOS SELECCIONADOS:*\n\n`;
   productos.forEach((p) => {
@@ -59,23 +64,32 @@ function enviarPedidoWhatsApp(pedido) {
   });
 
   // 💵 TOTALES
+if (tipoEntrega === "Domicilio") {
   msg += `\n*TOTAL PRODUCTOS:* ${formatoPesos(subtotal)}\n`;
   if (costoDomicilio)
     msg += `*COSTO DE DOMICILIO:* ${formatoPesos(costoDomicilio)}\n\n`;
+}
 
-  msg += `*TOTAL A PAGAR:* ${formatoPesos(total)}\n`;
+  msg += `\n*TOTAL A PAGAR:* ${formatoPesos(total)}\n`;
   msg += `*MÉTODO DE PAGO:* ${metodoPago}\n\n`;
 
   msg += `*PROPINA VOLUNTARIA (10%):* ${formatoPesos(propina)}\n`;
   msg += `*TOTAL CON PROPINA:* ${formatoPesos(totalConPropina)}\n\n`;
 
-  // 📝 Observaciones
-  msg += `*OBSERVACIONES:*\n${observaciones || "____"}\n\n`;
+// 📝 Observaciones
+msg += `*OBSERVACIONES:*\n${observaciones || "____"}\n\n`;
 
-  // 📍 Ubicación
-  if (ubicacion) {
-    msg += `*Ubicación en Google Maps:*\n${ubicacion}\n\n`;
-  }
+// 📍 Ubicación del cliente solo si hay
+if (ubicacion) {
+  msg += `*Ubicación en Google Maps:*\n${ubicacion}\n\n`;
+}
+
+
+// 📍 Ubicación de la tienda solo si es recoger en tienda
+if (tipoEntrega.toLowerCase().includes("recoger")) {
+  msg += `*Ubicación de la tienda:*\nhttps://goo.su/X4C1\n\n`;
+}
+
 
   msg += `*Envía tu pedido aqui --------->*`;
 

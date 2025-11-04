@@ -1,0 +1,80 @@
+{
+    "tituloPagina": "Pide en Mr. George a domicilio | Restaurante | Ordena online",
+    "nombreRestaurante": "Mr. George",
+    "logo": "img/icono_tienda.png",
+    "colores": {
+        "--bg-body": "linear-gradient(135deg, #FFD700, #000000)",
+        "--bg-start": "#333",
+        "--bg-end": "#444",
+        "--card-bg": "#222",
+        "--muted": "#c4c4c4",
+        "--mutedquantitybtn": "#7272724f",
+        "--primary-1": "#ffc400",
+        "--primary-2": "#e0b800",
+        "--primary-3": "#b19000",
+        "--accent": "linear-gradient(45deg, var(--primary-1) 0%, var(--primary-2) 100%)",
+        "--text-color": "#fff",
+        "--textarea": "#444",
+        "--quantitymodaltext": "#444"
+    },
+    "categorias": [
+        {
+            "id": "almuerzos",
+            "emoji": "🍛",
+            "nombre": "Almuerzos"
+        },
+        {
+            "id": "perros",
+            "emoji": "🌭",
+            "nombre": "Perros"
+        },
+        {
+            "id": "hamburguesas",
+            "emoji": "🍔",
+            "nombre": "Hamburguesas"
+        },
+        {
+            "id": "salchipapas",
+            "emoji": "🍟",
+            "nombre": "Salchipapas"
+        },
+        {
+            "id": "picadas",
+            "emoji": "🍖",
+            "nombre": "Picadas"
+        },
+        {
+            "id": "bebidas",
+            "emoji": "🥤",
+            "nombre": "Bebidas"
+        },
+        {
+            "id": "acompanantes",
+            "emoji": "🍴",
+            "nombre": "Acompañantes"
+        }
+    ],
+    "redes": {
+        "whatsapp": "https://wa.me/573022666530",
+        "instagram": "https://www.instagram.com/mr_ge0rge/",
+        "facebook": "https://www.facebook.com/MISTERGE0RGE"
+    },
+    "footerQR": "img/QR_tienda.png",
+    "sede": {
+        "nombre": "Mr. George - Cartagena, Bolivar.",
+        "direccion": "San Fernando, Cl 5, Cra 81 f 05",
+        "telefono": "(+57) 302 266 6530"
+    },
+    "coordenadasSede": [
+        10.373750,
+        -75.473580
+    ],
+    "footerLogo": "img/logo.png",
+    "crearTienda": "https://wa.me/573022666530?text=Quiero%20crear%20mi%20tienda",
+    "apiUrls": {
+        "productos": "https://script.google.com/macros/s/AKfycbxE5905w07prM6Om7B972nZilOZOEi_IUgX2Cixf98F9t-U8A9ClVxq5pyRjXAt5Zg/exec",
+        "horario": "https://script.google.com/macros/s/AKfycbxOCBCR_1CsQJz9YljFyiL3YxgnvlUy_eEQMSmmIf9jvsCt0aO0RjoUD0yfTbq1_liXXQ/exec",
+        "envioBaseDatos": "https://script.google.com/macros/s/AKfycbwez78KX4oEXCGWV_olvy_J1C8YwURxN-1YaZiYYqQJPVLAJuaRI_5EVl4v14OMjonM/exec",
+        "cocina": "https://script.google.com/macros/s/AKfycbwez78KX4oEXCGWV_olvy_J1C8YwURxN-1YaZiYYqQJPVLAJuaRI_5EVl4v14OMjonM/exec"
+    }
+}

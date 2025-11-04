@@ -63,12 +63,10 @@
 
         <label style="font-weight: bold;">Proteína:</label>
         <div id="almuerzo-proteina" style="margin-bottom: 10px;">
-            <label><input type="checkbox" value="Carne guisada"> Carne guisada</label><br>
+            <label><input type="checkbox" value="Carne asada"> Carne asada</label><br>
             <label><input type="checkbox" value="Carne en bistec"> Carne en bistec</label><br>
-            <label><input type="checkbox" value="Carne desmechada"> Carne desmechada</label><br>
             <label><input type="checkbox" value="Chuleta de cerdo"> Chuleta de cerdo</label><br>
             <label><input type="checkbox" value="Masa de cerdo"> Masa de cerdo</label><br>
-            <label><input type="checkbox" value="Pollo guisado"> Pollo guisado</label><br>
             <label><input type="checkbox" value="Pollo frito"> Pollo frito</label><br>
         </div>
 

@@ -3,39 +3,31 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Mr. George | Restaurante</title>
-  <link rel="icon" type="image/png" href="img/icono_tienda.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Cargando...</title>
+  <link rel="icon" type="image/png" href="">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   <!-- HEADER + CATEGORÍAS combinados -->
-  <header class="header-wrapper">
+ <header class="header-wrapper">
     <div class="header">
       <div class="header-left">
         <a href="index.html">
-          <img src="img/icono_tienda.png" alt="Logo" class="header-logo">
+          <img src="" alt="Logo del restaurante" class="header-logo">
         </a>
         <div class="header-info">
-          <h1>Mr. George</h1>
+          <h1></h1>
           <div id="status-header"></div>
           <div id="status-subtext"></div>
         </div>
       </div>
     </div>
 
-    <nav class="categories">
-      <button class="category-btn active" onclick="scrollToSection('todos')">🌟 Todos</button>
-      <button class="category-btn" onclick="scrollToSection('almuerzos')">🍛 Almuerzos</button>
-      <button class="category-btn" onclick="scrollToSection('perros')">🌭 Perros</button>
-      <button class="category-btn" onclick="scrollToSection('hamburguesas')">🍔 Hamburguesas</button>
-      <button class="category-btn" onclick="scrollToSection('salchipapas')">🍟 Salchipapas</button>
-      <button class="category-btn" onclick="scrollToSection('picadas')">🍖 Picadas</button>
-      <!--<button class="category-btn" onclick="scrollToSection('pizzas')">🍕 Pizzas</button>-->
-      <button class="category-btn" onclick="scrollToSection('bebidas')">🥤 Bebidas</button>
-      <button class="category-btn" onclick="scrollToSection('acompanantes')">🍴 Acompañantes</button>
-    </nav>
+
+  <!-- 🔥 Botones generados dinámicamente -->
+  <nav class="categories"></nav>
   </header>
 
 
@@ -151,57 +143,7 @@
     Error al cargar los productos. Por favor, actualiza la página.
   </div>
   <!-- Menu Sections -->
-  <div class="menu-sections">
-
-    <!-- Almuerzos Section -->
-    <section id="almuerzos" class="menu-section">
-      <h2 class="section-title">🍛 Almuerzos</h2>
-      <div class="products-grid" id="almuerzos-grid"></div>
-    </section>
-
-    <!-- Perros Section -->
-    <section id="perros" class="menu-section">
-      <h2 class="section-title">🌭 Perros</h2>
-      <div class="products-grid" id="perros-grid"></div>
-    </section>
-
-    <!-- Hamburguesas Section -->
-    <section id="hamburguesas" class="menu-section">
-      <h2 class="section-title">🍔 Hamburguesas</h2>
-      <div class="products-grid" id="hamburguesas-grid"></div>
-    </section>
-
-    <!-- Salchipapas Section -->
-    <section id="salchipapas" class="menu-section">
-      <h2 class="section-title">🍟 Salchipapas</h2>
-      <div class="products-grid" id="salchipapas-grid"></div>
-    </section>
-
-    <!-- Picadas Section -->
-    <section id="picadas" class="menu-section">
-      <h2 class="section-title">🍖 Picadas</h2>
-      <div class="products-grid" id="picadas-grid"></div>
-    </section>
-
-    <!-- Pizzas Section -->
-    <!--<section id="pizzas" class="menu-section">
-      <h2 class="section-title">🍕 Pizzas</h2>
-      <div class="products-grid" id="pizzas-grid"></div>
-    </section>-->
-
-    <!-- Bebidas Section -->
-    <section id="bebidas" class="menu-section">
-      <h2 class="section-title">🥤 Bebidas</h2>
-      <div class="products-grid" id="bebidas-grid"></div>
-    </section>
-
-    <!-- Acompañantes Section -->
-    <section id="acompanantes" class="menu-section">
-      <h2 class="section-title">🍴 Acompañantes</h2>
-      <div class="products-grid" id="acompanantes-grid"></div>
-    </section>
-
-  </div>
+  <div class="menu-sections"></div>
 
 
 
@@ -250,17 +192,17 @@
       </div>
 
       <!-- Incrementadores y botón fijo abajo -->
-<div class="modal-actions">
-  <!-- Precio dinámico -->
-  <span class="add-to-cart-price" id="modal-add-price">
-    <span class="price-number">0</span>
-  </span>
+      <div class="modal-actions">
+        <!-- Precio dinámico -->
+        <span class="add-to-cart-price" id="modal-add-price">
+          <span class="price-number">0</span>
+        </span>
 
-  <!-- Botón -->
-  <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
-    Agregar
-  </button>
-</div>
+        <!-- Botón -->
+        <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
+          Agregar
+        </button>
+      </div>
     </div>
   </div>
 
@@ -387,28 +329,24 @@
   <!-- === FOOTER INFO === -->
   <footer class="footer-info">
     <div class="footer-socials">
-      <a href="https://wa.me/573001234567" target="_blank" class="social-link">
+      <a href="#" target="_blank" class="social-link">
         <img src="iconos/redes/whatsapp.png" alt="WhatsApp">
       </a>
-      <a href="https://www.instagram.com/mrgeorge" target="_blank" class="social-link">
+      <a href="#" target="_blank" class="social-link">
         <img src="iconos/redes/instagram.png" alt="Instagram">
       </a>
-      <a href="https://www.facebook.com/mrgeorge" target="_blank" class="social-link">
+      <a href="#" target="_blank" class="social-link">
         <img src="iconos/redes/facebook.png" alt="Facebook">
       </a>
     </div>
 
     <div class="footer-qr">
-      <img src="img/QR tienda.png" alt="QR Mr. George">
+      <img src="" alt="QR Mr. George">
     </div>
 
-    <div class="footer-branches">
-      <p><strong>Sedes</strong><br>
-        Mr. George Cartagena, Bolivar<br>
-        San fernando, Cl 5, Cra 81 f 05<br>
-        <span class="telefono">(+57) 302 266 6530</span>
-      </p>
-    </div>
+  <div class="footer-branches">
+    <p></p>
+  </div>
 
 
     <div class="footer-policies">
@@ -416,16 +354,17 @@
       <a href="privacity.html" target="_blank">Políticas de privacidad</a>
     </div>
 
-    <div class="footer-content">
-      <div>
-        <img src="img/logo.png" alt="Logo Mr. George" class="footer-logo">
-      </div>
+  <div class="footer-content">
+    <div>
+      <img src="" alt="Logo del restaurante" class="footer-logo">
+    </div>
 
-      <div class="create-store">
-        <a href="https://wa.me/573022666530?text=Quiero%20crear%20mi%20tienda" target="_blank" class="create-store-btn">
-          Crea tu tienda aquí
-        </a>
-      </div>
+<div class="create-store">
+  <a href="#" target="_blank" class="create-store-btn">
+    Crea tu tienda aquí
+  </a>
+</div>
+
   </footer>
 
   <script>
@@ -449,6 +388,7 @@
     }, { passive: false });
   </script>
 
+  <script src="config-loader.js"></script>
   <script src="horario.js"></script>
   <script src="productos-variable.js"></script>
   <script src="domicilio.js"></script>

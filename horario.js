@@ -1,7 +1,7 @@
 // =====================================
-// CONFIGURACIÓN
+// CONFIGURACIÓN (desde config.json)
 // =====================================
-const SCHEDULE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOCBCR_1CsQJz9YljFyiL3YxgnvlUy_eEQMSmmIf9jvsCt0aO0RjoUD0yfTbq1_liXXQ/exec';
+let SCHEDULE_APPS_SCRIPT_URL = "";
 window.tiendaAbierta = false;
 
 // =====================================
@@ -32,6 +32,11 @@ function capitalize(text) {
 // =====================================
 async function loadSchedule() {
   try {
+    if (!SCHEDULE_APPS_SCRIPT_URL) {
+      console.warn("⚠️ No se ha configurado la URL del horario todavía.");
+      return;
+    }
+
     const res = await fetch(SCHEDULE_APPS_SCRIPT_URL, {
       cache: "no-cache",
       headers: { "Accept": "application/json" }
@@ -50,10 +55,11 @@ async function loadSchedule() {
     displaySchedule(schedule);
   } catch (err) {
     console.error("❌ Error al cargar horarios:", err);
-    // Si falla, mostrar mensaje claro
     const el = document.getElementById("status-header");
-    el.textContent = "No se pudo cargar el horario, intenta recargar la página.";
-    el.style.background = "#e67e22";
+    if (el) {
+      el.textContent = "No se pudo cargar el horario, intenta recargar la página.";
+      el.style.background = "#e67e22";
+    }
   }
 }
 
@@ -63,14 +69,21 @@ async function loadSchedule() {
 function displaySchedule(schedule) {
   const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const now = new Date();
-
-  // Aseguramos que use horario Colombia (UTC-5)
   const localNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Bogota" }));
-  const currentDay = days[localNow.getDay()];
+  const currentDayIndex = localNow.getDay();
+  const currentDay = days[currentDayIndex];
   const today = schedule.find(s => s.day === currentDay);
 
   if (!today || !today.estado) {
-    setClosed("Hoy la tienda está cerrada.");
+    const { nextDay, daysUntil } = findNextOpenDay(schedule, currentDayIndex);
+    if (nextDay) {
+      const msg = daysUntil === 1
+        ? `Volvemos mañana a las ${formatTime(nextDay.open)}`
+        : `Abrimos el ${nextDay.day.toLowerCase()} a las ${formatTime(nextDay.open)} (${daysUntil} día${daysUntil > 1 ? 's' : ''})`;
+      setClosed("Hoy la tienda no abre", msg);
+    } else {
+      setClosed("Cerrado temporalmente", "No hay próximos horarios disponibles.");
+    }
     window.tiendaAbierta = false;
     return;
   }
@@ -80,8 +93,6 @@ function displaySchedule(schedule) {
 
   const close = new Date(localNow);
   close.setHours(today.close.h, today.close.m, 0, 0);
-
-  // Si cierra pasada la medianoche (ej. 00:00)
   if (close <= open) close.setDate(close.getDate() + 1);
 
   if (localNow >= open && localNow <= close) {
@@ -89,20 +100,56 @@ function displaySchedule(schedule) {
     const diffMin = Math.floor((close - localNow) / 60000);
     const h = Math.floor(diffMin / 60);
     const m = diffMin % 60;
-    const closeText = h > 0
-      ? `Cierra en ${h} hora(s) ${m} minuto(s)`
-      : `Cierra en ${m} minuto(s)`;
-    setOpen("¡La tienda está abierta!", closeText);
-  } else {
-    window.tiendaAbierta = false;
-    const tomorrow = schedule[(localNow.getDay() + 1) % 7];
-    const nextText = today.close.h < today.open.h
-      ? `Abre más tarde hoy a las ${formatTime(today.open)}`
-      : tomorrow && tomorrow.estado
-      ? `Abre mañana a las ${formatTime(tomorrow.open)}`
-      : `Abre próximamente`;
-    setClosed("La tienda está cerrada.", nextText);
+
+    let mensaje;
+    if (diffMin <= 15) {
+      mensaje = `Cerramos pronto a las ${formatTime(today.close)}`;
+    } else if (h >= 1) {
+      mensaje = `Cerramos a las ${formatTime(today.close)} (en ${h} h ${m} min)`;
+    } else {
+      mensaje = `Cerramos en ${m} minuto${m !== 1 ? "s" : ""}`;
+    }
+
+    setOpen("¡La tienda está abierta!", mensaje);
+    return;
   }
+
+  if (localNow < open) {
+    const diffMin = Math.floor((open - localNow) / 60000);
+    const h = Math.floor(diffMin / 60);
+    const m = diffMin % 60;
+    const msg = h > 0
+      ? `Abrimos hoy a las ${formatTime(today.open)} (en ${h} h ${m} min)`
+      : `Abrimos en ${m} minuto${m !== 1 ? "s" : ""}`;
+    setClosed("Aún no abrimos", msg);
+    window.tiendaAbierta = false;
+    return;
+  }
+
+  if (localNow > close) {
+    const { nextDay, daysUntil } = findNextOpenDay(schedule, currentDayIndex);
+    if (nextDay) {
+      const msg = daysUntil === 1
+        ? `Volvemos mañana a las ${formatTime(nextDay.open)}`
+        : `Abrimos el ${nextDay.day.toLowerCase()} a las ${formatTime(nextDay.open)} (${daysUntil} día${daysUntil > 1 ? 's' : ''})`;
+      setClosed("Cerramos por hoy", msg);
+    } else {
+      setClosed("Cerramos por hoy", "No hay próximos horarios disponibles.");
+    }
+    window.tiendaAbierta = false;
+  }
+}
+
+function findNextOpenDay(schedule, currentIndex) {
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  for (let i = 1; i <= 7; i++) {
+    const nextIndex = (currentIndex + i) % 7;
+    const next = schedule.find(s => s.day === days[nextIndex]);
+    if (next && next.estado) {
+      return { nextDay: next, daysUntil: i };
+    }
+  }
+  return { nextDay: null, daysUntil: null };
 }
 
 function formatTime({ h, m }) {
@@ -117,26 +164,36 @@ function formatTime({ h, m }) {
 function setOpen(title, subtitle = "") {
   const header = document.getElementById("status-header");
   const sub = document.getElementById("status-subtext");
+  if (!header) return;
   header.style.background = "#27ae27";
   header.style.color = "#fff";
   header.textContent = title;
-  sub.textContent = subtitle;
+  if (sub) sub.textContent = subtitle;
 }
 
 function setClosed(title, subtitle = "") {
   const header = document.getElementById("status-header");
   const sub = document.getElementById("status-subtext");
+  if (!header) return;
   header.style.background = "#e74c3c";
   header.style.color = "#fff";
   header.textContent = title;
-  sub.textContent = subtitle;
+  if (sub) sub.textContent = subtitle;
 }
 
 // =====================================
 // AUTOEJECUCIÓN Y REFRESCO
 // =====================================
 document.addEventListener("DOMContentLoaded", () => {
-  loadSchedule();
-  // Refresca cada 1 min por si el horario cambia en Sheets
-  setInterval(loadSchedule, 1 * 60 * 1000);
+  // Esperar a que config.json esté cargado
+  document.addEventListener("configCargado", (e) => {
+    const config = e.detail;
+    if (config?.apiUrls?.horario) {
+      SCHEDULE_APPS_SCRIPT_URL = config.apiUrls.horario;
+      loadSchedule();
+      setInterval(loadSchedule, 60 * 1000); // refrescar cada minuto
+    } else {
+      console.warn("⚠️ No se encontró apiUrls.horario en config.json");
+    }
+  });
 });

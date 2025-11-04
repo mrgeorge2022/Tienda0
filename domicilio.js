@@ -3,18 +3,42 @@
 // 🗺️ MAPA LEAFLET - DOMICILIO CON RUTA, COSTO Y BUSCADOR INTELIGENTE + BARRIOS PREDEFINIDOS
 // ================================
 let map, markerUsuario, routingControl;
-const tiendaCoords = [10.373750, -75.473580];
+let tiendaCoords = [10.393386, -75.4828850]; // valor por defecto cenro de cartagena
+let nombreTienda = "Mi Restaurante";
+
+// 🧩 Cargar configuración desde config.json
+async function cargarConfig() {
+  try {
+    const res = await fetch("config.json");
+    if (!res.ok) throw new Error("No se pudo cargar config.json");
+    const data = await res.json();
+
+    // ✅ Asignamos dinámicamente los valores
+    if (data?.coordenadasSede) tiendaCoords = data.coordenadasSede;
+    if (data?.logo) logoTienda = data.logo;
+    if (data?.sede?.nombre) nombreTienda = data.sede.nombre;
+
+    return data; // devolvemos la configuración cargada
+  } catch (error) {
+    console.error("⚠️ Error cargando config.json:", error);
+    return null;
+  }
+}
+
 let costoDomicilio = 0;
 
 // ================================
 // 🎨 ÍCONOS PERSONALIZADOS
 // ================================
-const tiendaIcon = L.icon({
-  iconUrl: "img/icono_tienda.png",
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
+// 🗺️ Crear ícono dinámico desde JSON
+function crearIconoTienda() {
+  return L.icon({
+    iconUrl: logoTienda, // 👈 aquí usamos lo que venga desde config.json
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
+  });
+}
 
 const usuarioIcon = L.icon({
   iconUrl: "iconos/pinubicacion.png",
@@ -190,6 +214,9 @@ function initMap() {
 
   map.zoomControl.setPosition("bottomleft");
 
+  // 🟢 Usamos la función que genera el ícono dinámicamente
+  const tiendaIcon = crearIconoTienda();
+
   const markerTienda = L.marker(tiendaCoords, { icon: tiendaIcon }).addTo(map);
   markerTienda.bindPopup("<b>Mr. George</b><br>📍 Tienda principal");
 
@@ -245,7 +272,7 @@ const searchInput = document.getElementById("buscar");
 const suggestionsEl = document.getElementById("suggestions");
 
 searchInput.addEventListener("input", async () => {
-  const query = searchInput.value.trim().toUpperCase();
+const query = searchInput.value.trim();
   suggestionsEl.innerHTML = "";
 
   if (!query) {
@@ -254,6 +281,31 @@ searchInput.addEventListener("input", async () => {
   }
 
   let resultados = 0;
+
+  // 📍 1. Si el usuario escribió coordenadas (con o sin paréntesis)
+const coordRegex = /^\(?\s*-?\d{1,2}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*\)?$/;
+
+if (coordRegex.test(query)) {
+  // 🧹 Limpiar los paréntesis y espacios
+  const clean = query.replace(/[()]/g, "").trim();
+  const [latStr, lonStr] = clean.split(",");
+  const lat = parseFloat(latStr);
+  const lon = parseFloat(lonStr);
+
+  const div = document.createElement("div");
+  div.textContent = `📍 Coordenadas: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+  div.addEventListener("click", async () => {
+    searchInput.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    suggestionsEl.style.display = "none";
+    map.setView([lat, lon], 15);
+    await mostrarMarcadorUsuario(lat, lon);
+    detectarDireccion(lat, lon);
+    calcularRutaYCostos([lat, lon]);
+  });
+  suggestionsEl.appendChild(div);
+  resultados++;
+}
+
 
   // 🏘️ Buscar coincidencias en los barrios
   const locales = barrios.filter((b) => b.nombre.includes(query));
@@ -436,6 +488,20 @@ document.addEventListener("DOMContentLoaded", () => {
 // 🧾 FINALIZAR PEDIDO (SIEMPRE PIDE DATOS) Y ENVIAR A WHATSAPP
 // ================================
 function finalizarPedido() {
+  // ⚠️ Verificar si el cliente seleccionó una ubicación válida
+  if (!markerUsuario || !map.hasLayer(markerUsuario)) {
+    alert("Por favor selecciona una ubicación antes de continuar.");
+    return;
+  }
+
+  const { lat, lng } = markerUsuario.getLatLng();
+
+  // Si el marcador no se ha movido de la posición inicial de la tienda
+  if (lat === tiendaCoords[0] && lng === tiendaCoords[1]) {
+    alert("Por favor selecciona una ubicación válida antes de continuar.");
+    return;
+  }
+
   // Mostrar siempre el modal para confirmar nombre y teléfono
   const modal = document.getElementById("customer-modal");
   const form = document.getElementById("customer-form");
@@ -469,6 +535,7 @@ function finalizarPedido() {
     enviarPedidoDomicilio(nombre, telefono);
   };
 }
+
 
 // ================================
 // 🚀 CONSTRUIR Y ENVIAR PEDIDO (DOMICILIO)
@@ -546,10 +613,12 @@ function closeCustomerModal() {
 // ================================
 // 🗺️ Inicialización
 // ================================
-window.addEventListener("DOMContentLoaded", () => {
-  initMap();
-  actualizarCostos();
+window.addEventListener("DOMContentLoaded", async () => {
+  await cargarConfig(); // primero carga el JSON
+  initMap();            // luego inicializa el mapa
+  actualizarCostos();   // finalmente actualiza los costos
 });
+
 
 
 

@@ -1,10 +1,12 @@
 // ==========================================
-// 🧾 RECOLECTAR Y ENVIAR PEDIDO A GOOGLE SHEETS
+// 🧾 RECOLECTAR Y ENVIAR PEDIDO A GOOGLE SHEETS / BASE DE DATOS
 // ==========================================
 
-// Recolecta los datos desde el objeto "pedido" que ya generas en domicilio.js
+// Variable global que se llenará desde config.json
+let ENVIO_BASE_DATOS_URL = "";
+
+// Recolecta los datos desde el objeto "pedido"
 function recolectarDatosParaSheets(pedido) {
-  // 🛒 Convertir productos a texto con formato legible
   const productosFormateados = (pedido.productos || [])
     .map(p => {
       const instrucciones = p.instrucciones ? ` (${p.instrucciones})` : "";
@@ -12,15 +14,11 @@ function recolectarDatosParaSheets(pedido) {
     })
     .join("\n");
 
-  // Convertir a números para evitar concatenaciones de strings
   const totalProductos = Number(pedido.subtotal || 0);
   const costoDomicilio = Number(pedido.costoDomicilio || 0);
-
-  // Calcular total a pagar
   const totalPagar = totalProductos + costoDomicilio;
 
-  // 🧮 Crear objeto limpio con las columnas esperadas por el Apps Script
-  const datos = {
+  return {
     tipoEntrega: pedido.tipoEntrega || "",
     numeroFactura: pedido.factura || "",
     fecha: pedido.fecha || "",
@@ -31,41 +29,46 @@ function recolectarDatosParaSheets(pedido) {
     direccion: pedido.direccion || "",
     puntoReferencia: pedido.referencia || "",
     productos: productosFormateados || "",
-    totalProductos: totalProductos,
-    costoDomicilio: costoDomicilio,
-    totalPagar: totalPagar,
+    totalProductos,
+    costoDomicilio,
+    totalPagar,
     metodoPago: pedido.metodoPago || "No especificado",
     ubicacionGoogleMaps: pedido.ubicacion || "",
     observaciones: pedido.observaciones || ""
   };
-
-  return datos;
 }
 
-
 // ==========================================
-// 🚀 ENVIAR DATOS A GOOGLE SHEETS
+// 🚀 ENVIAR DATOS A GOOGLE SHEETS / BASE DE DATOS
 // ==========================================
-
 async function enviarPedidoASheets(pedido) {
   const datos = recolectarDatosParaSheets(pedido);
 
-  // ✅ URL de tu Apps Script publicado como web app
-  const scriptURL =
-    "https://script.google.com/macros/s/AKfycbwez78KX4oEXCGWV_olvy_J1C8YwURxN-1YaZiYYqQJPVLAJuaRI_5EVl4v14OMjonM/exec";
+  if (!ENVIO_BASE_DATOS_URL) {
+    console.error("⚠️ No se ha configurado la URL para envío a base de datos (apiUrls.envioBaseDatos).");
+    return;
+  }
 
   try {
-    await fetch(scriptURL, {
+    await fetch(ENVIO_BASE_DATOS_URL, {
       method: "POST",
-      mode: "no-cors", // 👈 evita errores CORS en navegador
-      headers: {
-        "Content-Type": "application/json",
-      },
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datos),
     });
-
-    console.log("✅ Pedido enviado correctamente a Google Sheets");
   } catch (err) {
-    console.error("❌ Error al enviar pedido a Sheets:", err);
+    console.error("❌ Error al enviar pedido:", err);
   }
 }
+
+// ==========================================
+// ⚙️ CARGAR CONFIGURACIÓN DESDE config.json
+// ==========================================
+document.addEventListener("configCargado", (e) => {
+  const config = e.detail;
+  if (config?.apiUrls?.envioBaseDatos) {
+    ENVIO_BASE_DATOS_URL = config.apiUrls.envioBaseDatos;
+  } else {
+    console.warn("⚠️ No se encontró apiUrls.envioBaseDatos en config.json");
+  }
+});
